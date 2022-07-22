@@ -18,3 +18,4 @@ To Do List: (Not ordered in priority)
 7. Work on Wireless tab
 8. Remove About tab and move to help menu
 9. Work on menu action items
+10. Test on Ubuntu and Fedora
