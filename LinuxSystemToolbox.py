@@ -6,6 +6,7 @@
 |                         Written by: Lothar TheQuiet                           |
 |                          lotharthequiet@gmail.com                             |
 |                   Graphing Logic Assitance: Tai Gong Quan                     |
+|                      Hounding about caMELCase: Rilvyk                         |
 |                                                                               |
 *********************************************************************************
 
@@ -90,26 +91,18 @@ def selectinterface():
         disableintbtn.config(text="Disable")      #Change the button text to disable if interface is enabled
     else:
         disableintbtn.config(text="Enable")       #Change the button text to enable if interface is disabled
-    #Get mac address
+    #Get add info
     intmacaddress = subprocess.Popen("ifconfig " + intname + " | grep ether | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get MTU
     intmtu = subprocess.Popen("ifconfig " + intname + " | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get IP address
     intipaddress = subprocess.Popen("ifconfig " + intname + " | grep inet | head -n +1 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get subnet mask
     intsubnetmask = subprocess.Popen("ifconfig " + intname + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get def gw
     intdefaultgw = subprocess.Popen("netstat -r | tail -n +3 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get broadcast address
     intbroadcastaddress = subprocess.Popen("ifconfig " + intname + " | grep inet | head -n +1 | awk '{print$6}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get DNS server addresses (qty 2)
     dnsserveraddresses = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     dnsserveraddresses = dnsserveraddresses.split()
-    #Get DNS hostname
     inthostname = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get DNS domain name
     intdnsdomainname = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    #Get interface stats
+    #Get int stats
     rxpacketcount = subprocess.Popen("ifconfig " + intname + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     rxpacketbytecount = subprocess.Popen("ifconfig " + intname + " | grep 'RX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     rxpackethumansize = subprocess.Popen("ifconfig " + intname + " | grep 'RX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
@@ -232,7 +225,6 @@ proctabbtnfrm = tk.Frame(proctab).grid(column = 2, row = 0, padx = DEFPADX, pady
 killprocBtn = tk.Button(proctabbtnfrm, text="Kill Process").grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
 spawnprocBtn = tk.Button(proctabbtnfrm, text="Spawn Process").grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=N)
 
-
 """servicesTab Layout"""
 svcstabttlfrm = tk.LabelFrame(servicestab, text="System Services:").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICFULLFRMSTICKY, columnspan=2)
 svcstabttllbl = tk.Label(svcstabttlfrm, text="Test Label").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
@@ -251,7 +243,6 @@ usrtabbtnfrm = tk.Frame(userstab).grid(column = 2, row = 0, padx = DEFPADX, pady
 newuserbtn = tk.Button(usrtabbtnfrm, text="New User").grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
 
 """nettab Layout"""
-#Setup frames and buttons for nettab
 nettabcontfrm = tk.Frame(nettab).grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 nettabbtnfrm = tk.Frame(nettab).grid(column = 1, row = 0, padx = 0, pady = (10, 5), sticky='N')
 intstatsfrm = tk.LabelFrame(nettab, text="Interface Statistics:").grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky = STATICFULLFRMSTICKY, columnspan = 2)
@@ -261,7 +252,7 @@ dhcpreleasebtn = ttk.Button(nettabbtnfrm, text ="DHCP Release", width = BTNSIZE,
 dhcprenewbtn = ttk.Button(nettabbtnfrm, text ="DHCP Renew", width = BTNSIZE, command=dhcprenew).grid(column = 0, row = 2, padx = DEFPADX, pady = DEFPADY, sticky='N')
 nettoolboxbtn = ttk.Button(nettabbtnfrm, text ="Toolbox", width= BTNSIZE, command=opennettoolbox).grid(column = 0, row = 3, padx = DEFPADX, pady = DEFPADY, sticky='N')
 
-#nettab - Interface Info
+#Interface Info
 selintname = tk.StringVar()
 intlbl = ttk.Label(nettabcontfrm, text ="Select Interface:").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 intcombo = ttk.Combobox(nettabcontfrm, values = intlist).grid(column = 1, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
@@ -290,7 +281,7 @@ dnshostname = ttk.Label(nettabcontfrm, text="").grid(column = 1, row = 9, padx =
 dnsdomainlbl = ttk.Label(nettabcontfrm, text="DNS Domain:").grid(column = 0, row = 10, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 dnsdomain = ttk.Label(nettabcontfrm, text="").grid(column = 1, row = 10, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 
-#netTab - Interface Stats
+#Interface Stats
 rxpacketlbl = tk.Label(intstatsfrm, text="RX packets").grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky = STATICSTICKY)
 rxpacketcntlbl = tk.Label(intstatsfrm, text="").grid(column = 1, row = 0, padx = DEFPADX, pady = DEFPADY, sticky = STATICSTICKY)
 rxpacketbyteslbl = tk.Label(intstatsfrm, text="bytes").grid(column = 2, row = 0, padx = DEFPADX, pady = DEFPADY, sticky = STATICSTICKY)
@@ -320,7 +311,7 @@ txframecountlbl = tk.Label(intstatsfrm, text="").grid(column = 7, row = 3, padx 
 txcollisionslbl = tk.Label(intstatsfrm, text="collisions").grid(column = 8, row = 3, padx = DEFPADX, pady = DEFPADY, sticky = STATICSTICKY)
 txcollisionscountlbl = tk.Label(intstatsfrm, text="").grid(column = 9, row = 3, padx = DEFPADX, pady = DEFPADY, sticky = STATICSTICKY)
 
-#netTab - Routing Table
+#Routing Table
 routingtablecontlbl = tk.Label(routetblfrm, text = "Destination").grid(column = 0, row = 0, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
 routingtablecontlbl = tk.Label(routetblfrm, text = "Gateway").grid(column = 1, row = 0, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
 routingtablecontlbl = tk.Label(routetblfrm, text = "Genmask").grid(column = 2, row = 0, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
@@ -341,7 +332,7 @@ for x in introutetable:
 		routingtablecontlbl = tk.Label(routetblfrm, text = x).grid(column = count, row = rowcount, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
 		count = count + 1
 
-#aboutTab Layout
+"""aboutTab Layout"""
 abouttabttlfrm = tk.LabelFrame(abouttab, text = LSTNAME).grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY, columnspan=3)
 aboutauthorlbl = ttk.Label(abouttabttlfrm, text ="Written By:").grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 aboutauthor = ttk.Label(abouttabttlfrm, text = LSTAUTHOR).grid(column = 1, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
