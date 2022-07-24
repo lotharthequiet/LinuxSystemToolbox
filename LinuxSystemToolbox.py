@@ -240,8 +240,8 @@ proctabspawnprocessBtn.grid(column = 0, row = 1, padx = staticpadx, pady = stati
 """servicesTab Layout"""
 servicestabtitleframe = tk.LabelFrame(servicestab, text="System Services:")
 servicestabtitleframe.grid(column = 0, row = 0, padx = staticpadx, pady = (10, 5), sticky=staticfullframesticky, columnspan=2)
-servicestabtitlelbl = tk.Label(proctabbuttonframe, text="Test Label")
-servicestabtitlelbl.grid(column = 0, row = 0, padx = staticpadx, pady = (10, 5), sticky=staticsticky)
+#servicestabtitlelbl = tk.Label(proctabbuttonframe, text="Test Label")
+#servicestabtitlelbl.grid(column = 0, row = 0, padx = staticpadx, pady = (10, 5), sticky=staticsticky)
 servicestabbuttonframe = tk.Frame(servicestab)
 servicestabbuttonframe.grid(column = 2, row = 0, padx = staticpadx, pady = staticpady, sticky=staticsticky)
 servicestabenableprocessbtn = tk.Button(servicestabbuttonframe, text="Enable Service")
