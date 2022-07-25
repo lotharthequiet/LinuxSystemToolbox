@@ -32,8 +32,6 @@ WARNING: (Default level) Indication things are not so good
 ERROR: More serious prob preventing app from running
 CRITICAL: Serious error
 """
-logging.basicConfig(level=logging.DEBUG)
-#logging.debug(error statement here)
 
 """Define System Variables"""
 LSTVER = "0.1a"                                                                         #Sytem Version number
@@ -42,55 +40,58 @@ LSTAUTHOR = "Lothar TheQuiet"                                                   
 LSTCONTACT = "lotharthequiet@gmail.com"                                                 #Application Author Contact
 LSTGITHUBREPO = "https://github.com/lotharthequiet/LinuxSystemToolbox"                  #GitHub Repository
 LSTGITHUB = "https://github.com/lotharthequiet/LinuxSystemToolbox.git"                  #GitHub Direct Link
-DEFPADX = 10                                                                               #Static X Padding Value
-DEFPADY = 5                                                                                #Static Y Padding Value
+DEFPADX = 10                                                                            #Static X Padding Value
+DEFPADY = 5                                                                             #Static Y Padding Value
 NARROWPAD = 5                                                                           #Static Narrow Pad Value
 BTNSIZE = 12                                                                            #Static button size value
 STATICSTICKY = W                                                                        #Static sticky direction
 STATICFULLFRMSTICKY = NSEW                                                              #Static full sticky for label frames
+LSTLOGGER = logging.getLogger(__name__)
+logging.basicConfig(filename='LinuxSystemToolbox.log', level=logging.DEBUG,
+    format='%(created)f:%(levelname)s:%(message)s')
 
 """  ***** Define routines/gather info *****  """
 def toggleinterface():
-    logging.debug("Toggle Interface")
+    LSTLOGGER.debug("Toggle Interface")
 
 def dhcprelease():
-    logging.debug("DHCP Release")
+    LSTLOGGER.debug("DHCP Release")
 
 def dhcprenew():
-    logging.debug("DHCP Renew")
+    LSTLOGGER.debug("DHCP Renew")
 
 def opennettoolbox():
-    logging.debug("Open Toolbox")
+    LSTLOGGER.debug("Open Toolbox")
 
 def switchuser():
-    logging.debug("Switch User")
+    LSTLOGGER.debug("Switch User")
 
 def logout():
-    logging.debug("Logout")
+    LSTLOGGER.debug("Logout")
 
 def restart():
-    logging.debug("Restart")
+    LSTLOGGER.debug("Restart")
 
 def shutdown():
-    logging.debug("Shutdown")
+    LSTLOGGER.debug("Shutdown")
 
 def openmanpage():
-    logging.debug("Open Man Pages.")
+    LSTLOGGER.debug("Open Man Pages.")
 
 def openabout():
-    logging.debug("Open About Tab.")
+    LSTLOGGER.debug("Open About Tab.")
 
 def runreports():
-    logging.debug("Run reports.")
+    LSTLOGGER.debug("Run reports.")
 
 def selectinterface():
-    logging.debug("Select Interface Function.")
-    logging.debug(intcombo.get())
+    LSTLOGGER.debug("Select Interface Function.")
+    LSTLOGGER.debug(intcombo.get())
     #Get selected interface name
     intname = intcombo.get()
     #Get interface status
     intstatus = subprocess.Popen("ifconfig " + intname + " | head -n 1 | awk {'print$2'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    logging.debug(intstatus)
+    LSTLOGGER.debug(intstatus)
     intstatusStr = "UP"
     connectedStatusStr = "RUNNING"
     if intstatusStr in intstatus:                       #iterate through raw int status and find UP L1 status
@@ -130,33 +131,33 @@ def selectinterface():
     txoverrunscount = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     txcarrier = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     txcollisions = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    logging.debug(intname)
-    logging.debug(intstatus)
-    logging.debug(intmacaddress)
-    logging.debug(intmtu)
-    logging.debug(intipaddress)
-    logging.debug(intsubnetmask)
-    logging.debug(intdefaultgw)
-    logging.debug(intbroadcastaddress)
+    LSTLOGGER.debug(intname)
+    LSTLOGGER.debug(intstatus)
+    LSTLOGGER.debug(intmacaddress)
+    LSTLOGGER.debug(intmtu)
+    LSTLOGGER.debug(intipaddress)
+    LSTLOGGER.debug(intsubnetmask)
+    LSTLOGGER.debug(intdefaultgw)
+    LSTLOGGER.debug(intbroadcastaddress)
     for server in dnsserveraddresses:
-        logging.debug(server)
-    logging.debug(inthostname)
-    logging.debug(intdnsdomainname)
-    logging.debug(rxpacketcount)
-    logging.debug(rxpacketbytecount)
-    logging.debug(rxpackethumansize)
-    logging.debug(rxerrorcount)
-    logging.debug(rxdroppedcount)
-    logging.debug(rxoverrunscount)
-    logging.debug(rxframecount)
-    logging.debug(txpacketcount)
-    logging.debug(txpacketbytecount)
-    logging.debug(txpackethumansize)
-    logging.debug(txerrorcount)
-    logging.debug(txdroppedcount)
-    logging.debug(txoverrunscount)
-    logging.debug(txcarrier)
-    logging.debug(txcollisions)
+        LSTLOGGER.debug(server)
+    LSTLOGGER.debug(inthostname)
+    LSTLOGGER.debug(intdnsdomainname)
+    LSTLOGGER.debug(rxpacketcount)
+    LSTLOGGER.debug(rxpacketbytecount)
+    LSTLOGGER.debug(rxpackethumansize)
+    LSTLOGGER.debug(rxerrorcount)
+    LSTLOGGER.debug(rxdroppedcount)
+    LSTLOGGER.debug(rxoverrunscount)
+    LSTLOGGER.debug(rxframecount)
+    LSTLOGGER.debug(txpacketcount)
+    LSTLOGGER.debug(txpacketbytecount)
+    LSTLOGGER.debug(txpackethumansize)
+    LSTLOGGER.debug(txerrorcount)
+    LSTLOGGER.debug(txdroppedcount)
+    LSTLOGGER.debug(txoverrunscount)
+    LSTLOGGER.debug(txcarrier)
+    LSTLOGGER.debug(txcollisions)
 
 
 """Get lst Info"""
@@ -232,7 +233,7 @@ lst.pack(expand = 1, fill ="both")
 """Tab Layout"""
 """procTab Layout"""
 proctabttlfrm = tk.LabelFrame(proctab, text="Running Processes:").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICFULLFRMSTICKY, columnspan=2)
-#proctabttllbl = tk.Label(proctabttlfrm, text="Test Label").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
+proctabttllbl = tk.Label(proctabttlfrm, text="Test Label").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 proctabbtnfrm = tk.Frame(proctab).grid(column = 2, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 killprocBtn = tk.Button(proctabbtnfrm, text="Kill Process").grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
 spawnprocBtn = tk.Button(proctabbtnfrm, text="Spawn Process").grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=N)
