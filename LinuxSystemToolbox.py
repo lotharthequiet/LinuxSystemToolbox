@@ -10,20 +10,6 @@
 |                                                                               |
 *********************************************************************************
 
-"""
-
-#load necessary modules
-from ctypes import alignment
-import sys
-import tkinter as tk                    
-from tkinter import ttk
-import os
-from tkinter import *
-import webbrowser
-import subprocess
-from pyparsing import col
-import logging
-"""
 Logging Levels:
 ------------------------------------------------------------
 DEBUG: Detailed info
@@ -32,6 +18,18 @@ WARNING: (Default level) Indication things are not so good
 ERROR: More serious prob preventing app from running
 CRITICAL: Serious error
 """
+
+#load necessary modules
+from ctypes import alignment
+from tkinter import ttk
+from tkinter import *
+from pyparsing import col
+
+import sys
+import tkinter as tk                    
+import os
+import subprocess
+import logging
 
 """Define System Variables"""
 LSTVER = "0.1a"                                                                         #Sytem Version number
@@ -47,10 +45,16 @@ BTNSIZE = 12                                                                    
 STATICSTICKY = W                                                                        #Static sticky direction
 STATICFULLFRMSTICKY = NSEW                                                              #Static full sticky for label frames
 LSTLOGGER = logging.getLogger(__name__)
-logging.basicConfig(filename='LinuxSystemToolbox.log', level=logging.DEBUG,
-    format='%(created)f:%(levelname)s:%(message)s')
+LSTLOGGER.setLevel(logging.INFO)
+LSTLOGGERFMT = logging.Formatter('%(created)f:%(levelname)s:%(message)s')
+LSTLOGHANDLER = logging.FileHandler('LinuxSystemToolbox.log')
+LSTLOGHANDLER.setFormatter(LSTLOGGERFMT)
+LSTLOGGER.addHandler(LSTLOGHANDLER)
+LSTLOGGERSTRM = logging.StreamHandler()
+LSTLOGGERSTRM.setFormatter(LSTLOGGERFMT)
+LSTLOGGER.addHandler(LSTLOGGERSTRM)
 
-"""  ***** Define routines/gather info *****  """
+""" Define routines/gather info """
 def toggleinterface():
     LSTLOGGER.debug("Toggle Interface")
 
