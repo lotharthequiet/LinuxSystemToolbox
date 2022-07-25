@@ -22,6 +22,18 @@ from tkinter import *
 import webbrowser
 import subprocess
 from pyparsing import col
+import logging
+"""
+Logging Levels:
+------------------------------------------------------------
+DEBUG: Detailed info
+INFO: Confirmation of things working correctly
+WARNING: (Default level) Indication things are not so good
+ERROR: More serious prob preventing app from running
+CRITICAL: Serious error
+"""
+logging.basicConfig(level=logging.DEBUG)
+#logging.debug(error statement here)
 
 """Define System Variables"""
 LSTVER = "0.1a"                                                                         #Sytem Version number
@@ -39,46 +51,46 @@ STATICFULLFRMSTICKY = NSEW                                                      
 
 """  ***** Define routines/gather info *****  """
 def toggleinterface():
-    print("Toggle Interface")
+    logging.debug("Toggle Interface")
 
 def dhcprelease():
-    print("DHCP Release")
+    logging.debug("DHCP Release")
 
 def dhcprenew():
-    print("DHCP Renew")
+    logging.debug("DHCP Renew")
 
 def opennettoolbox():
-    print("Open Toolbox")
+    logging.debug("Open Toolbox")
 
 def switchuser():
-    print("Switch User")
+    logging.debug("Switch User")
 
 def logout():
-    print("Logout")
+    logging.debug("Logout")
 
 def restart():
-    print("Restart")
+    logging.debug("Restart")
 
 def shutdown():
-    print("Shutdown")
+    logging.debug("Shutdown")
 
 def openmanpage():
-    print("Open Man Pages.")
+    logging.debug("Open Man Pages.")
 
 def openabout():
-    print("Open About Tab.")
+    logging.debug("Open About Tab.")
 
 def runreports():
-    print("Run reports.")
+    logging.debug("Run reports.")
 
 def selectinterface():
-    print("Select Interface Function.")
-    print(intcombo.get())
+    logging.debug("Select Interface Function.")
+    logging.debug(intcombo.get())
     #Get selected interface name
     intname = intcombo.get()
     #Get interface status
     intstatus = subprocess.Popen("ifconfig " + intname + " | head -n 1 | awk {'print$2'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    print(intstatus)
+    logging.debug(intstatus)
     intstatusStr = "UP"
     connectedStatusStr = "RUNNING"
     if intstatusStr in intstatus:                       #iterate through raw int status and find UP L1 status
@@ -118,33 +130,33 @@ def selectinterface():
     txoverrunscount = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     txcarrier = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
     txcollisions = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    print(intname)
-    print(intstatus)
-    print(intmacaddress)
-    print(intmtu)
-    print(intipaddress)
-    print(intsubnetmask)
-    print(intdefaultgw)
-    print(intbroadcastaddress)
+    logging.debug(intname)
+    logging.debug(intstatus)
+    logging.debug(intmacaddress)
+    logging.debug(intmtu)
+    logging.debug(intipaddress)
+    logging.debug(intsubnetmask)
+    logging.debug(intdefaultgw)
+    logging.debug(intbroadcastaddress)
     for server in dnsserveraddresses:
-        print(server)
-    print(inthostname)
-    print(intdnsdomainname)
-    print(rxpacketcount)
-    print(rxpacketbytecount)
-    print(rxpackethumansize)
-    print(rxerrorcount)
-    print(rxdroppedcount)
-    print(rxoverrunscount)
-    print(rxframecount)
-    print(txpacketcount)
-    print(txpacketbytecount)
-    print(txpackethumansize)
-    print(txerrorcount)
-    print(txdroppedcount)
-    print(txoverrunscount)
-    print(txcarrier)
-    print(txcollisions)
+        logging.debug(server)
+    logging.debug(inthostname)
+    logging.debug(intdnsdomainname)
+    logging.debug(rxpacketcount)
+    logging.debug(rxpacketbytecount)
+    logging.debug(rxpackethumansize)
+    logging.debug(rxerrorcount)
+    logging.debug(rxdroppedcount)
+    logging.debug(rxoverrunscount)
+    logging.debug(rxframecount)
+    logging.debug(txpacketcount)
+    logging.debug(txpacketbytecount)
+    logging.debug(txpackethumansize)
+    logging.debug(txerrorcount)
+    logging.debug(txdroppedcount)
+    logging.debug(txoverrunscount)
+    logging.debug(txcarrier)
+    logging.debug(txcollisions)
 
 
 """Get lst Info"""
@@ -220,7 +232,7 @@ lst.pack(expand = 1, fill ="both")
 """Tab Layout"""
 """procTab Layout"""
 proctabttlfrm = tk.LabelFrame(proctab, text="Running Processes:").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICFULLFRMSTICKY, columnspan=2)
-proctabttllbl = tk.Label(proctabttlfrm, text="Test Label").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
+#proctabttllbl = tk.Label(proctabttlfrm, text="Test Label").grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 proctabbtnfrm = tk.Frame(proctab).grid(column = 2, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 killprocBtn = tk.Button(proctabbtnfrm, text="Kill Process").grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
 spawnprocBtn = tk.Button(proctabbtnfrm, text="Spawn Process").grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=N)
