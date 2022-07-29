@@ -16,6 +16,5 @@ To Do List: (Not ordered in priority)
 5. Finish Networking tab
 6. Work on Performance tab
 7. Work on Wireless tab
-8. Remove About tab and move to help menu
-9. Work on menu action items
-10. Test on Ubuntu and Fedora
+8. Work on menu action items
+9. Test on Ubuntu and Fedora
