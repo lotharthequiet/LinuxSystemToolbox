@@ -25,6 +25,8 @@ import subprocess
 from tkinter import ttk
 from re import search
 
+from LinuxSystemToolbox.LinuxSystemToolbox import CURRENTDNS
+
 """Define System Variables"""
 LSTVER = "0.1b"                                                                         #Sytem Version number
 LSTNAME = "Linux System Toolbox"                                                        #Application Name
@@ -56,7 +58,7 @@ except Exception as e:
 INTLIST = INTLIST.split()
 CURRENTINT = ""
 CURRENTINTSTAT = ""
-
+CURRENTDNS = tk.StringVar()
 
 class App():
     root = tk.Tk()
@@ -192,7 +194,7 @@ class App():
         bcastaddr.grid(column = 1, row = 7, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
         dnsserverslbl = tk.Label(nettabcontfrm, text="DNS Servers:")
         dnsserverslbl.grid(column = 0, row = 8, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-        dnsserveraddr = tk.Label(nettabcontfrm, textvariable=currentdns).grid(column = 1, row = 8, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+        dnsserveraddr = tk.Label(nettabcontfrm, textvariable=CURRENTDNS).grid(column = 1, row = 8, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
         dnshostnamelbl = tk.Label(nettabcontfrm, text="DNS Hostname:")
         dnshostnamelbl.grid(column = 0, row = 9, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
         dnshostname = tk.Label(nettabcontfrm, text="", width = 25)
@@ -288,7 +290,6 @@ class App():
         rfwrlssbtn.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky='N')
 
         App.root.config(menu=menubar)
-        App.root.mainloop()
 
     def runreports(self):
         LSTLOGGER.debug("Open System Reports Window.")
@@ -461,5 +462,30 @@ class App():
         LSTLOGGER.debug(txoverrunscount)
         LSTLOGGER.debug(txcarrier)
         LSTLOGGER.debug(txcollisions)
-            
+
+    def getdnsservers(self):
+        LSTLOGGER.debug("getdnsservers function.")
+        CURRENTDNS.set = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'| head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        LSTLOGGER.debug(CURRENTDNS)
+    
+    def getroutetable(self):
+        LSTLOGGER.debug("Get route table.")
+        try:
+            introutetable = subprocess.Popen("netstat -r | tail -n +3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        except Exception as e:
+            LSTLOGGER.error("Unable to retrieve route table.", e)
+        introutetable = introutetable.split()
+        count = 0
+        rowcount = 1
+        for x in introutetable:
+            if count == 8:
+                count = 0
+                rowcount = rowcount + 1
+                routetablecontentry = tk.Label(self.routetblfrm, text = x).grid(column = count, row = rowcount, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
+                count = count + 1
+            elif count < 8:
+                routetablecontentry = tk.Label(self.routetblfrm, text = x).grid(column = count, row = rowcount, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
+                count = count + 1
+                    
 app=App()
+App.root.mainloop()
