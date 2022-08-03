@@ -23,17 +23,17 @@ CRITICAL: Serious error
 from ctypes import alignment
 from tkinter import ttk
 from tkinter import *
+from turtle import width
 from matplotlib.pyplot import fill
 from pyparsing import col
+from re import search
 
 import sys
 import tkinter as tk                    
 import os
 import subprocess
 import logging
-from rx import catch
 
-from sympy import expand
 
 """Define System Variables"""
 LSTVER = "0.1a"                                                                         #Sytem Version number
@@ -57,11 +57,38 @@ LSTLOGGER.addHandler(LSTLOGHANDLER)
 LSTLOGGERSTRM = logging.StreamHandler()
 LSTLOGGERSTRM.setFormatter(LSTLOGGERFMT)
 LSTLOGGER.addHandler(LSTLOGGERSTRM)
+ROOT = tk.Tk()
+ROOT.title(LSTNAME)                                                     #Define App title
+ROOT.geometry("590x675")                                                #Define default app size
+lst = ttk.Notebook(ROOT)                                                #Nest the lst Notebook into the root tkWindow
+CURRENTINT = tk.StringVar()
+CURRENTINTSTAT = tk.StringVar()
+CURRENTDNS = tk.StringVar()
+try:
+    INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+except Exception as e:
+    LSTLOGGER.error("Unable to retrieve interface list.", e)
+INTLIST = INTLIST.split()
+
 
 """ Define routines/gather info """
+def updateinterface():
+    LSTLOGGER.debug("Update Interface")
+
 def toggleinterface():
     LSTLOGGER.debug("Toggle Interface")
-
+    LSTLOGGER.debug(CURRENTINTSTAT)
+    if CURRENTINTSTAT == "UP":
+        try:
+            subprocess.Popen("sudo ifconfig ", CURRENTINT, " down", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+            LSTLOGGER.debug("")
+        except Exception as e:
+            LSTLOGGER.error("Unable to disable interface: ", CURRENTINT, e)
+    else:
+        try:
+            subprocess.Popen("sudo ifconfig ", CURRENTINT, " up", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+        except Exception as e:
+            LSTLOGGER.error("Unable to enable interface: ", CURRENTINT, e)
 def dhcprelease():
     LSTLOGGER.debug("DHCP Release")
 
@@ -69,110 +96,134 @@ def dhcprenew():
     LSTLOGGER.debug("DHCP Renew")
 
 def opennettoolbox():
-    LSTLOGGER.debug("Open Toolbox")
+    LSTLOGGER.debug("Open Network Toolbox Window.")
+    toolboxwindow = Toplevel(ROOT)
+    toolboxwindow.title(LSTNAME)
+    toolboxwinttlfrm = tk.LabelFrame(toolboxwindow, text = "Network Toolbox")
+    toolboxwinttlfrm.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY, columnspan=3)
+    toolboxlbl = ttk.Label(toolboxwinttlfrm, text ="Written By:")
+    toolboxlbl.grid(column= 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY)
 
 def switchuser():
-    LSTLOGGER.debug("Switch User")
+    LSTLOGGER.debug("Switch User.")
 
 def logout():
-    LSTLOGGER.debug("Logout")
+    LSTLOGGER.debug("Logout.")
 
 def restart():
-    LSTLOGGER.debug("Restart")
+    LSTLOGGER.debug("Restart.")
 
 def shutdown():
-    LSTLOGGER.debug("Shutdown")
+    LSTLOGGER.debug("Shutdown.")
 
 def openhelp():
-    LSTLOGGER.debug("Open Help.")
+    LSTLOGGER.debug("Open Help Window.")
+    helpwindow = Toplevel(ROOT)
+    helpwindow.title(LSTNAME)
+    helpwinttlfrm = tk.LabelFrame(helpwindow, text = "Help")
+    helpwinttlfrm.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY)
+    helpauthorlbl = ttk.Label(helpwinttlfrm, text ="Written By:")
+    helpauthorlbl.grid(column= 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY)
 
 def openabout():
-    LSTLOGGER.debug("Open About Tab.")
-    aboutwindow = Toplevel(root)
+    LSTLOGGER.debug(LSTNAME)
+    aboutwindow = Toplevel(ROOT)
     aboutwindow.title(LSTNAME)
-    aboutwinttlfrm = tk.LabelFrame(aboutwindow, text = LSTNAME)
-    aboutwinttlfrm.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY, columnspan=3)
-    aboutauthorlbl = ttk.Label(aboutwindow, text ="Written By:")
+    aboutwinttlfrm = tk.LabelFrame(aboutwindow, text = "About")
+    aboutwinttlfrm.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY)
+    aboutauthorlbl = ttk.Label(aboutwinttlfrm, text ="Written By:")
     aboutauthorlbl.grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutauthor = ttk.Label(aboutwindow, text = LSTAUTHOR)
+    aboutauthor = ttk.Label(aboutwinttlfrm, text = LSTAUTHOR)
     aboutauthor.grid(column = 1, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutcontactlbl = ttk.Label(aboutwindow, text ="Contact:")
+    aboutcontactlbl = ttk.Label(aboutwinttlfrm, text ="Contact:")
     aboutcontactlbl.grid(column = 0, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutcontact = ttk.Label(aboutwindow, text = LSTCONTACT)
+    aboutcontact = ttk.Label(aboutwinttlfrm, text = LSTCONTACT)
     aboutcontact.grid(column = 1, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutgithubrepolbl = ttk.Label(aboutwindow, text ="GitHub Repository:")
+    aboutgithubrepolbl = ttk.Label(aboutwinttlfrm, text ="GitHub Repository:")
     aboutgithubrepolbl.grid(column = 0, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutgithubrepo = ttk.Label(aboutwindow, text = LSTGITHUBREPO)
+    aboutgithubrepo = ttk.Label(aboutwinttlfrm, text = LSTGITHUBREPO)
     aboutgithubrepo.grid(column = 1, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutgitlbl = ttk.Label(aboutwindow, text ="Git Link:")
+    aboutgitlbl = ttk.Label(aboutwinttlfrm, text ="Git Link:")
     aboutgitlbl.grid(column = 0, row = 4, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutgithubgit = ttk.Label(aboutwindow, text = LSTGITHUB)
+    aboutgithubgit = ttk.Label(aboutwinttlfrm, text = LSTGITHUB)
     aboutgithubgit.grid(column = 1, row = 4, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutverlbl = ttk.Label(aboutwindow, text = "Version:")
+    aboutverlbl = ttk.Label(aboutwinttlfrm, text = "Version:")
     aboutverlbl.grid(column = 0, row = 5, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-    aboutver = ttk.Label(aboutwindow, text = LSTVER)
+    aboutver = ttk.Label(aboutwinttlfrm, text = LSTVER)
     aboutver.grid(column = 1, row = 5, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 
 def runreports():
-    LSTLOGGER.debug("Run reports.")
+    LSTLOGGER.debug("Open System Reports Window.")
+    reportwindow = Toplevel(ROOT)
+    reportwindow.title(LSTNAME)
+    reportwinttlfrm = tk.LabelFrame(reportwindow, text = "System Reports")
+    reportwinttlfrm.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY, columnspan=3)
+    reportauthorlbl = ttk.Label(reportwinttlfrm, text ="Written By:")
+    reportauthorlbl.grid(column= 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICFULLFRMSTICKY)
 
 def selectinterface():
     LSTLOGGER.debug("Select Interface Function.")
     LSTLOGGER.debug(intcombo.get())
-    #Get selected interface name
-    intname = intcombo.get()
-    #Get interface status
-    intstatus = subprocess.Popen("ifconfig " + intname + " | head -n 1 | awk {'print$2'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+    CURRENTINT = intcombo.get()
+    try:
+        intstatus = subprocess.Popen("ip a sh dev " + CURRENTINT + " | head -n 1 | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    except Exception as e: 
+        LSTLOGGER.error("Unable to retrieve current interface status. ", e)
     LSTLOGGER.debug(intstatus)
-    intstatusStr = "UP"
-    connectedStatusStr = "RUNNING"
-    if intstatusStr in intstatus:                       #iterate through raw int status and find UP L1 status
-        if connectedStatusStr in intstatus:             #iterate through raw int status and find RUNNING L2 status
-            intstatusResult = True
+    intstatstr = "UP"
+    if search(intstatstr, intstatus):
+        LSTLOGGER.info("Interface UP")
+        disableintbtn.config(text="Disable")
+        disableintbtn.config(state=ACTIVE)
+        CURRENTINTSTAT == "UP"
     else:
-            intstatusResult = False
-    #Set button label
-    if intstatusResult:
-        disableintbtn.config(text="Disable")      #Change the button text to disable if interface is enabled
-    else:
-        disableintbtn.config(text="Enable")       #Change the button text to enable if interface is disabled
+        if search("DOWN", intstatus):
+            LSTLOGGER.info("Interface DOWN")
+            disableintbtn.config(text="Enable")
+            disableintbtn.config(state=ACTIVE)    
+            CURRENTINTSTAT == "DOWN"
+        else:
+            if CURRENTINT == "lo":
+                disableintbtn.config(text="Disable")
+                disableintbtn.config(state=DISABLED)
+            else:
+                disableintbtn.config(text="Disable")
+                disableintbtn.config(state=ACTIVE)
+
     #Get add info
-    intmacaddress = subprocess.Popen("ifconfig " + intname + " | grep ether | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    intmtu = subprocess.Popen("ifconfig " + intname + " | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    intipaddress = subprocess.Popen("ifconfig " + intname + " | grep inet | head -n +1 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    intsubnetmask = subprocess.Popen("ifconfig " + intname + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    intdefaultgw = subprocess.Popen("netstat -r | tail -n +3 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    intbroadcastaddress = subprocess.Popen("ifconfig " + intname + " | grep inet | head -n +1 | awk '{print$6}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    dnsserveraddresses = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    dnsserveraddresses = dnsserveraddresses.split()
-    inthostname = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    intdnsdomainname = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+    intmacaddress = subprocess.Popen("ifconfig " + CURRENTINT + " | grep ether | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    intmtu = subprocess.Popen("ifconfig " + CURRENTINT + " | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    intipaddress = subprocess.Popen("ifconfig " + CURRENTINT + " | grep inet | head -n +1 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    intsubnetmask = subprocess.Popen("ifconfig " + CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    intdefaultgw = subprocess.Popen("netstat -r | tail -n +3 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    intbroadcastaddress = subprocess.Popen("ifconfig " + CURRENTINT + " | grep inet | head -n +1 | awk '{print$6}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    getdnsservers()
+    inthostname = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    intdnsdomainname = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
     #Get int stats
-    rxpacketcount = subprocess.Popen("ifconfig " + intname + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    rxpacketbytecount = subprocess.Popen("ifconfig " + intname + " | grep 'RX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    rxpackethumansize = subprocess.Popen("ifconfig " + intname + " | grep 'RX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    rxerrorcount = subprocess.Popen("ifconfig " + intname + " | grep 'RX Errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    rxdroppedcount = subprocess.Popen("ifconfig " + intname + " | grep 'RX Errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    rxoverrunscount = subprocess.Popen("ifconfig " + intname + " | grep 'RX Errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    rxframecount = subprocess.Popen("ifconfig " + intname + " | grep 'RX Errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txpacketcount = subprocess.Popen("ifconfig " + intname + " | grep 'TX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txpacketbytecount = subprocess.Popen("ifconfig " + intname + " | grep 'TX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txpackethumansize = subprocess.Popen("ifconfig " + intname + " | grep 'TX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txerrorcount = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txdroppedcount = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txoverrunscount = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txcarrier = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    txcollisions = subprocess.Popen("ifconfig " + intname + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    LSTLOGGER.debug(intname)
-    LSTLOGGER.debug(intstatus)
+    rxpacketcount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    rxpacketbytecount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    rxpackethumansize = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    rxerrorcount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    rxdroppedcount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    rxoverrunscount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    rxframecount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txpacketcount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txpacketbytecount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txpackethumansize = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txerrorcount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txdroppedcount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txoverrunscount = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txcarrier = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    txcollisions = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    LSTLOGGER.debug(CURRENTINT)
+    LSTLOGGER.debug(CURRENTINTSTAT)
     LSTLOGGER.debug(intmacaddress)
     LSTLOGGER.debug(intmtu)
     LSTLOGGER.debug(intipaddress)
     LSTLOGGER.debug(intsubnetmask)
     LSTLOGGER.debug(intdefaultgw)
     LSTLOGGER.debug(intbroadcastaddress)
-    for server in dnsserveraddresses:
-        LSTLOGGER.debug(server)
     LSTLOGGER.debug(inthostname)
     LSTLOGGER.debug(intdnsdomainname)
     LSTLOGGER.debug(rxpacketcount)
@@ -194,9 +245,9 @@ def selectinterface():
 def getroutetable():
     LSTLOGGER.debug("Get route table.")
     try:
-        introutetable = subprocess.Popen("netstat -r | tail -n +3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-    except:
-        LSTLOGGER.error("Unable to retrieve route table.")
+        introutetable = subprocess.Popen("netstat -r | tail -n +3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    except Exception as e:
+        LSTLOGGER.error("Unable to retrieve route table.", e)
     introutetable = introutetable.split()
     count = 0
     rowcount = 1
@@ -212,13 +263,16 @@ def getroutetable():
 
 def exitapp():
     LSTLOGGER.debug("Exiting LST.")
-    root.quit()
+    ROOT.quit()
 
+def getdnsservers():
+    LSTLOGGER.debug("getdnsservers function.")
+    currentdns = tk.StringVar()
+    currentdns.set = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'| head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    LSTLOGGER.debug(currentdns)
 
 """Get lst Info"""
-#Get NIC list
-intlist = subprocess.Popen("ifconfig -s | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-intlist = intlist.split()
+
 
 """ This section of code left remarked intentionally
 #Get Default Gateway
@@ -234,12 +288,6 @@ intlist = intlist.split()
 #Get DNS Domain
 #dnsDomain = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
 """
-
-"""Setup Main Window"""
-root = tk.Tk()
-root.title(LSTNAME)                                                     #Define App title
-root.geometry("590x675")                                                #Define default app size
-lst = ttk.Notebook(root)                                                #Nest the lst Notebook into the root tkWindow
 
 """Setup File Menu"""
 menubar = Menu(lst)
@@ -278,7 +326,6 @@ lst.add(nettab, text ='Networking')
 lst.add(perftab, text ='Performance')
 lst.add(wirelesstab, text = 'Wireless')
 lst.pack(expand = 1, fill ="both")
-#lst.grid(column = 0, row = 0)
 
 """Tab Layout"""
 """procTab Layout"""
@@ -288,9 +335,9 @@ proctabttllbl = tk.Label(proctabttlfrm, text="Test Label")
 proctabttllbl.grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 proctabbtnfrm = tk.Frame(proctab)
 proctabbtnfrm.grid(column = 2, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-killprocbtn = tk.Button(proctabbtnfrm, text="Kill Process")
+killprocbtn = tk.Button(proctabbtnfrm, text="Kill Process", width = BTNSIZE)
 killprocbtn.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
-spawnprocbtn = tk.Button(proctabbtnfrm, text="Spawn Process")
+spawnprocbtn = tk.Button(proctabbtnfrm, text="Spawn Process", width = BTNSIZE)
 spawnprocbtn.grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=N)
 
 """servicesTab Layout"""
@@ -300,13 +347,13 @@ svcstabttllbl = tk.Label(svcstabttlfrm, text="Test Label")
 svcstabttllbl.grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 svcstabbtnfrm = tk.Frame(servicestab)
 svcstabbtnfrm.grid(column = 2, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-enablesvcbtn = tk.Button(svcstabbtnfrm, text="Enable Service")
+enablesvcbtn = tk.Button(svcstabbtnfrm, text="Enable Service", width = BTNSIZE)
 enablesvcbtn.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
-disablesvcbtn = tk.Button(svcstabbtnfrm, text="Disable Service")
+disablesvcbtn = tk.Button(svcstabbtnfrm, text="Disable Service", width = BTNSIZE)
 disablesvcbtn.grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=N)
-startsvcbtn = tk.Button(svcstabbtnfrm, text="Start Service")
+startsvcbtn = tk.Button(svcstabbtnfrm, text="Start Service", width = BTNSIZE)
 startsvcbtn.grid(column = 0, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=N)
-stopsvcbtn = tk.Button(svcstabbtnfrm, text="Stop Service")
+stopsvcbtn = tk.Button(svcstabbtnfrm, text="Stop Service", width = BTNSIZE)
 stopsvcbtn.grid(column = 0, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=N)
 
 """userTab Layout"""
@@ -320,8 +367,8 @@ usrtabttllbl = tk.Label(usrtabttlfrm, text="Test Label")
 usrtabttllbl.grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 usrtabbtnfrm = tk.Frame(userstab)
 usrtabbtnfrm.grid(column = 2, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-newuserbtn = tk.Button(usrtabbtnfrm, text="New User")
-newuserbtn.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky=N)
+newuserbtn = tk.Button(usrtabbtnfrm, text="New User", width = BTNSIZE)
+newuserbtn.grid(column = 0, row = 0, padx = DEFPADX, pady = DEFPADY, sticky='N')
 
 """nettab Layout"""
 nettabcontfrm = tk.Frame(nettab)
@@ -338,55 +385,55 @@ dhcpreleasebtn = ttk.Button(nettabbtnfrm, text ="DHCP Release", width = BTNSIZE,
 dhcpreleasebtn.grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky='N')
 dhcprenewbtn = ttk.Button(nettabbtnfrm, text ="DHCP Renew", width = BTNSIZE, command=dhcprenew)
 dhcprenewbtn.grid(column = 0, row = 2, padx = DEFPADX, pady = DEFPADY, sticky='N')
-nettoolboxbtn = ttk.Button(nettabbtnfrm, text ="Toolbox", width= BTNSIZE, command=opennettoolbox)
+nettoolboxbtn = ttk.Button(nettabbtnfrm, text ="Toolbox", width = BTNSIZE, command=opennettoolbox)
 nettoolboxbtn.grid(column = 0, row = 3, padx = DEFPADX, pady = DEFPADY, sticky='N')
 
 #Interface Info
 selintname = tk.StringVar()
 intlbl = ttk.Label(nettabcontfrm, text ="Select Interface:")
 intlbl.grid(column = 0, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
-intcombo = ttk.Combobox(nettabcontfrm, values = intlist)
+intcombo = ttk.Combobox(nettabcontfrm, values = INTLIST)
 intcombo.grid(column = 1, row = 0, padx = DEFPADX, pady = (10, 5), sticky=STATICSTICKY)
 intcombo.set("Select Interface:")
 intcombo.bind('<<ComboboxSelected>>', lambda event: selectinterface())
+intstatuslbl = ttk.Label(nettabcontfrm, text="Interface Status:")
+intstatuslbl.grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+intstatus = ttk.Label(nettabcontfrm, text = CURRENTINTSTAT)
+intstatus.grid(column = 1, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 macaddrlbl = ttk.Label(nettabcontfrm, text="Mac Address:")
-macaddrlbl.grid(column = 0, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-macaddr = ttk.Label(nettabcontfrm, text="")
-macaddr.grid(column = 1, row = 1, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+macaddrlbl.grid(column = 0, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+macaddr = ttk.Label(nettabcontfrm, text="", width = 18)
+macaddr.grid(column = 1, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 mtulbl = ttk.Label(nettabcontfrm, text ="MTU:")
-mtulbl.grid(column = 0, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-mtu = ttk.Label(nettabcontfrm, text = "")
-mtu.grid(column = 1, row = 2, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+mtulbl.grid(column = 0, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+mtu = ttk.Label(nettabcontfrm, text = "", width = 5)
+mtu.grid(column = 1, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 ipaddrlbl = ttk.Label(nettabcontfrm, text="IP Address:")
-ipaddrlbl.grid(column = 0, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-ipaddr = ttk.Label(nettabcontfrm, text="")
-ipaddr.grid(column = 1, row = 3, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+ipaddrlbl.grid(column = 0, row = 4, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+ipaddr = ttk.Label(nettabcontfrm, text="", width = 16)
+ipaddr.grid(column = 1, row = 4, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 submasklbl = ttk.Label(nettabcontfrm, text="Subnet Mask:")
-submasklbl.grid(column = 0, row = 4, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-submask = ttk.Label(nettabcontfrm, text="")
-submask.grid(column = 1, row = 4, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+submasklbl.grid(column = 0, row = 5, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+submask = ttk.Label(nettabcontfrm, text="", width = 16)
+submask.grid(column = 1, row = 5, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 defgwlbl = ttk.Label(nettabcontfrm, text="Default Gateway:")
-defgwlbl.grid(column = 0, row = 5, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-defgw = ttk.Label(nettabcontfrm, text="")
-defgw.grid(column = 1, row = 5, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+defgwlbl.grid(column = 0, row = 6, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+defgw = ttk.Label(nettabcontfrm, text="", width = 18)
+defgw.grid(column = 1, row = 6, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 bcastaddrlbl = ttk.Label(nettabcontfrm, text="Broadcast Address:")
-bcastaddrlbl.grid(column = 0, row = 6, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-bcastaddr = ttk.Label(nettabcontfrm, text="")
-bcastaddr.grid(column = 1, row = 6, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+bcastaddrlbl.grid(column = 0, row = 7, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+bcastaddr = ttk.Label(nettabcontfrm, text="", width = 18)
+bcastaddr.grid(column = 1, row = 7, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 dnsserverslbl = ttk.Label(nettabcontfrm, text="DNS Servers:")
-dnsserverslbl.grid(column = 0, row = 7, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-#rowcount = 7
-# for x in dnsServerAddresses:
-#     if rowcount < 9:
-#         netTabDNSServer = ttk.Label(nettabcontfrm, text=x).grid(column = 1, row = rowcount, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-#         rowcount = rowcount + 1
+dnsserverslbl.grid(column = 0, row = 8, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
+dnsserveraddr = ttk.Label(nettabcontfrm, textvariable=CURRENTDNS).grid(column = 1, row = 8, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 dnshostnamelbl = ttk.Label(nettabcontfrm, text="DNS Hostname:")
 dnshostnamelbl.grid(column = 0, row = 9, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-dnshostname = ttk.Label(nettabcontfrm, text="")
+dnshostname = ttk.Label(nettabcontfrm, text="", width = 25)
 dnshostname.grid(column = 1, row = 9, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 dnsdomainlbl = ttk.Label(nettabcontfrm, text="DNS Domain:")
 dnsdomainlbl.grid(column = 0, row = 10, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
-dnsdomain = ttk.Label(nettabcontfrm, text="")
+dnsdomain = ttk.Label(nettabcontfrm, text="", width = 25)
 dnsdomain.grid(column = 1, row = 10, padx = DEFPADX, pady = DEFPADY, sticky=STATICSTICKY)
 
 #Interface Stats
@@ -466,5 +513,6 @@ routetablecontlbl8 = tk.Label(routetblfrm, text = "Iface")
 routetablecontlbl8.grid(column = 7, row = 0, padx = NARROWPAD, pady = NARROWPAD, sticky = STATICSTICKY)
 
 """Run System"""
-root.config(menu=menubar)
-root.mainloop()
+ROOT.config(menu=menubar)
+ROOT.mainloop()
+
