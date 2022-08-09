@@ -18,28 +18,24 @@ WARNING: (Default level) Indication things are not so good
 ERROR: More serious prob preventing app from running
 CRITICAL: Serious error
 """
-from sqlite3 import Row
 import tkinter as tk
 import logging
 import subprocess
 
 from tkinter import DISABLED, ttk
 from re import search
-from tkinter import scrolledtext
-
-from paramiko import SFTPAttributes
 
 
 LSTLog = logging.getLogger(__name__) 
 LSTLog.setLevel(logging.DEBUG)
-LSTLoggerfmt = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+LSTLogfmt = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 LSTLogh = logging.FileHandler('LinuxSystemToolbox.log')
-LSTLogh.setFormatter(LSTLoggerfmt)
+LSTLogh.setFormatter(LSTLogfmt)
 LSTLog.addHandler(LSTLogh)
-#LSTLogSTRM = logging.StreamHandler()
-#LSTLogSTRM.setFormatter(LSTLogFMT)
-#LSTLog.addHandler(LSTLogSTRM)
-#LSTLog.debug("Starting LST...")
+LSTLogstrm = logging.StreamHandler()
+LSTLogstrm.setFormatter(LSTLogfmt)
+LSTLog.addHandler(LSTLogstrm)
+LSTLog.debug("Starting LST...")
 try:
     INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
 except Exception as e:
@@ -162,16 +158,96 @@ class GUIActions():
     def dhcprenew():
         LSTLog.info("DHCP Renew")
 
+    def getmacaddr(addr=None):
+        LSTLog.debug("getmacaddr function.")
+        try:
+            addr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep ether | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(addr)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive MAC address from interface: ", GlobalVars.CURRENTINT, e)
+        return addr
+
+    def getmtu(mtu=None):
+        LSTLog.debug("getmtu function.")
+        try:
+            mtu = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(mtu)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive MTU from interface: ", GlobalVars.CURRENTINT, e)
+        return mtu
+
+    def getipaddr(ipaddr=None):
+        LSTLog.debug("getipaddr function.")
+        try:
+            ipaddr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(ipaddr)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive IP address from interface: ", GlobalVars.CURRENTINT, e)
+        return ipaddr
+
+    def getsubmask(submask=None):
+        LSTLog.debug("getsubmask function.")
+        try:
+            submask = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(submask)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
+        return submask
+
+    def getdefgw(defgw=None):
+        LSTLog.debug("getdefgw function.")
+        try:
+            defgw = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(defgw)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive default gateway from interface: ", GlobalVars.CURRENTINT, e)
+        return defgw
+
+    def getbcastaddr(bcastaddr=None):
+        LSTLog.debug("getbcastaddr function.")
+        try:
+            bcastaddr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$6}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(bcastaddr)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
+        return bcastaddr
+
+    def getdnsserveraddr(dnsserveraddr=None):
+        LSTLog.debug("getdnsserveraddr function.")
+        try:
+            dnsserveraddr = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'| head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(dnsserveraddr)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive system DNS address(es).", e)
+        return dnsserveraddr
+
+    def gethostname(hostname=None):
+        LSTLog.debug("gethostname function.")
+        try:
+            hostname = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(hostname)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive system host name.", e)
+        return hostname
+
+    def getdomainname(domainname=None):
+        LSTLog.debug("getdomainname function.")
+        try:
+            domainname = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(domainname)
+        except Exception as e:
+            LSTLog.warning("Unable to retrive system domain name.", e)
+        return domainname
+
     def selectinterface():
         LSTLog.info("Select Interface Function.")
-        LSTLog.debug(BuildGUI.intcombo.get())
-        CURRENTINT = BuildGUI.intcombo.get()
+        GlobalVars.CURRENTINT = BuildGUI.intcombo.get()
+        LSTLog.debug(GlobalVars.CURRENTINT)
         try:
-            intstatus = subprocess.Popen("ip a sh dev " + CURRENTINT + " | head -n 1 | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstatus = subprocess.Popen("netstat -r | tail -n +3 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         except Exception as e: 
             LSTLog.error("Unable to retrieve current interface status. ", e)
-            intstatstr = "UP"
-        if search(intstatstr, intstatus):
+        if search("UP", intstatus):
             LSTLog.info("Interface UP")
             BuildGUI.disableintbtn.config(text="Disable", state="normal")
             BuildGUI.intstatus['text'] = "Up"
@@ -181,7 +257,7 @@ class GUIActions():
                 BuildGUI.disableintbtn.config(text="Enable", state="normal")
                 BuildGUI.intstatus['text'] = "Down"
             else:
-                if CURRENTINT == "lo":
+                if GlobalVars.CURRENTINT == "lo":
                     LSTLog.info("Interface Loopback")
                     BuildGUI.disableintbtn.config(text="Disable", state="disabled")
                     BuildGUI.intstatus['text'] = "Loopback"
@@ -189,59 +265,31 @@ class GUIActions():
                     LSTLog.info("Interface Unknown")
                     BuildGUI.disableintbtn.config(text="Disable", state="normal")
                     BuildGUI.intstatus['text'] = "Unknown"
-        BuildGUI.macaddr['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep ether | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.macaddr['text'])
-        BuildGUI.mtu['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.mtu['text'])
-        BuildGUI.ipaddr['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep inet | head -n +1 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.ipaddr['text'])
-        BuildGUI.submask['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.submask['text'])
-        BuildGUI.defgw['text'] = subprocess.Popen("netstat -r | tail -n +3 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.defgw['text'])
-        BuildGUI.bcastaddr['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep inet | head -n +1 | awk '{print$6}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.bcastaddr['text'])
-        GUIActions.getdnsservers()
-        BuildGUI.dnshostname['text'] = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.dnshostname['text'])
-        BuildGUI.dnsdomain['text'] = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.dnsdomain['text'])
-        BuildGUI.rxpacketcntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxpacketcntlbl['text'])
-        BuildGUI.rxpacketbytescntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxpacketbytescntlbl['text'])
-        BuildGUI.rxpacketbyteshumancntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxpacketbyteshumancntlbl['text'])
-        BuildGUI.rxerrorscntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxerrorscntlbl['text'])
-        BuildGUI.rxdroppedcntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxdroppedcntlbl['text'])
-        BuildGUI.rxoverrunscntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxoverrunscntlbl['text'])
-        BuildGUI.rxframecntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'RX Errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.rxframecntlbl['text'])
-        BuildGUI.txpacketcntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txpacketcntlbl['text'])
-        BuildGUI.txpacketbytescntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txpacketbytescntlbl['text'])
-        BuildGUI.txpacketbyteshumcntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txpacketbyteshumcntlbl['text'])
-        BuildGUI.txerrorscntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txerrorscntlbl['text'])
-        BuildGUI.txdroppedcntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txdroppedcntlbl['text'])
-        BuildGUI.txoverrunscntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txoverrunscntlbl['text'])
-        BuildGUI.txfrmcntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txfrmcntlbl['text'])
-        BuildGUI.txcolscntlbl['text'] = subprocess.Popen("ifconfig " + CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.txcolscntlbl['text'])
+        BuildGUI.macaddr['text'] = GUIActions.getmacaddr()
+        BuildGUI.mtu['text'] = GUIActions.getmtu()
+        BuildGUI.ipaddr['text'] = GUIActions.getipaddr()
+        BuildGUI.submask['text'] = GUIActions.getsubmask()
+        BuildGUI.defgw['text'] = GUIActions.getdefgw()
+        BuildGUI.bcastaddr['text'] = GUIActions.getbcastaddr()
+        BuildGUI.dnsserveraddr['text'] = GUIActions.getdnsserveraddr()
+        BuildGUI.dnshostname['text'] = GUIActions.gethostname()
+        BuildGUI.dnsdomain['text'] = GUIActions.getdomainname()
+        BuildGUI.rxpacketcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.rxpacketbytescntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.rxpacketbyteshumancntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.rxerrorscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.rxdroppedcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.rxoverrunscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.rxframecntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txpacketcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txpacketbytescntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txpacketbyteshumcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txerrorscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txdroppedcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txoverrunscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txfrmcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.txcolscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         #getroutetable()
-
-    def getdnsservers():
-        LSTLog.debug("getdnsservers function.")
-        BuildGUI.dnsserveraddr['text'] = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'| head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        LSTLog.debug(BuildGUI.dnsserveraddr['text'])
     
     def getroutetable():
         LSTLog.debug("Get route table.")
@@ -521,11 +569,11 @@ class BuildGUI():
     macaddrlbl = tk.Label(nettabcontfrm, text="Mac Address:")
     macaddrlbl.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
     macaddr = tk.Label(nettabcontfrm, text="")
-    macaddr.grid(column = 1, row = 2, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
+    macaddr.grid(column = 1, row = 2, sticky=GlobalVars.STATICSTICKY)
     mtulbl = tk.Label(nettabcontfrm, text ="MTU:")
     mtulbl.grid(column = 0, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
     mtu = tk.Label(nettabcontfrm, text = "")
-    mtu.grid(column = 1, row = 3, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
+    mtu.grid(column = 1, row = 3, sticky=GlobalVars.STATICSTICKY)
     ipaddrlbl = tk.Label(nettabcontfrm, text="IP Address:")
     ipaddrlbl.grid(column = 0, row = 4, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
     ipaddr = tk.Label(nettabcontfrm, text="")
