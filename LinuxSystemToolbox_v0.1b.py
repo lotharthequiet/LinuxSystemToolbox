@@ -18,6 +18,7 @@ WARNING: (Default level) Indication things are not so good
 ERROR: More serious prob preventing app from running
 CRITICAL: Serious error
 """
+from ast import Global
 import tkinter as tk
 import logging
 import subprocess
@@ -59,6 +60,9 @@ class GlobalVars(object):
     STATICFULLFRMSTICKY = "NSEW"                                                              #Static full sticky for label frames
     CURRENTINT = ""
     CURRENTINTSTAT = ""
+    PROC = tk.StringVar()
+    MAINICO = "tools.png"
+    BROWSEICO = "browse.png"
 """
 class LSTLog():
     def init_log()
@@ -80,7 +84,7 @@ class GUIActions():
         LSTLog.debug("Open System Reports Window.")
         reportwindow = tk.Toplevel(root)
         reportwindow.title(GlobalVars.LSTFULLNAME)
-        ico = Image.open('hand-tool.png')
+        ico = Image.open(GlobalVars.MAINICO)
         photo = ImageTk.PhotoImage(ico)
         reportwindow.wm_iconphoto(False, photo)
         reportwinttlfrm = tk.LabelFrame(reportwindow, text = "System Reports")
@@ -108,7 +112,7 @@ class GUIActions():
         LSTLog.debug("Open Help Window.")
         helpwindow = tk.Toplevel(root)
         helpwindow.title(GlobalVars.LSTFULLNAME)
-        ico = Image.open('hand-tool.png')
+        ico = Image.open(GlobalVars.MAINICO)
         photo = ImageTk.PhotoImage(ico)
         helpwindow.wm_iconphoto(False, photo)
         helpwinttlfrm = tk.LabelFrame(helpwindow, text = "Help")
@@ -120,7 +124,7 @@ class GUIActions():
         LSTLog.debug("Open About Window.")
         aboutwindow = tk.Toplevel(root)
         aboutwindow.title(GlobalVars.LSTFULLNAME)
-        ico = Image.open('hand-tool.png')
+        ico = Image.open(GlobalVars.MAINICO)
         photo = ImageTk.PhotoImage(ico)
         aboutwindow.wm_iconphoto(False, photo)
         aboutwinttlfrm = tk.LabelFrame(aboutwindow, text = "About")
@@ -173,7 +177,7 @@ class GUIActions():
             addr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep ether | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(addr)
         except Exception as e:
-            LSTLog.warning("Unable to retrive MAC address from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.error("Unable to retrive MAC address from interface: ", GlobalVars.CURRENTINT, e)
         return addr
 
     def getmtu(mtu=None):
@@ -182,7 +186,7 @@ class GUIActions():
             mtu = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(mtu)
         except Exception as e:
-            LSTLog.warning("Unable to retrive MTU from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.error("Unable to retrive MTU from interface: ", GlobalVars.CURRENTINT, e)
         return mtu
 
     def getipaddr(ipaddr=None):
@@ -191,7 +195,7 @@ class GUIActions():
             ipaddr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(ipaddr)
         except Exception as e:
-            LSTLog.warning("Unable to retrive IP address from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.error("Unable to retrive IP address from interface: ", GlobalVars.CURRENTINT, e)
         return ipaddr
 
     def getsubmask(submask=None):
@@ -200,7 +204,7 @@ class GUIActions():
             submask = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(submask)
         except Exception as e:
-            LSTLog.warning("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.error("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
         return submask
 
     def getdefgw(defgw=None):
@@ -209,7 +213,7 @@ class GUIActions():
             defgw = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(defgw)
         except Exception as e:
-            LSTLog.warning("Unable to retrive default gateway from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.error("Unable to retrive default gateway from interface: ", GlobalVars.CURRENTINT, e)
         return defgw
 
     def getbcastaddr(bcastaddr=None):
@@ -218,7 +222,7 @@ class GUIActions():
             bcastaddr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$6}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(bcastaddr)
         except Exception as e:
-            LSTLog.warning("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.error("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
         return bcastaddr
 
     def getdnsserveraddr(dnsserveraddr=None):
@@ -227,7 +231,7 @@ class GUIActions():
             dnsserveraddr = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'| head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(dnsserveraddr)
         except Exception as e:
-            LSTLog.warning("Unable to retrive system DNS address(es).", e)
+            LSTLog.error("Unable to retrive system DNS address(es).", e)
         return dnsserveraddr
 
     def gethostname(hostname=None):
@@ -236,7 +240,7 @@ class GUIActions():
             hostname = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(hostname)
         except Exception as e:
-            LSTLog.warning("Unable to retrive system host name.", e)
+            LSTLog.error("Unable to retrive system host name.", e)
         return hostname
 
     def getdomainname(domainname=None):
@@ -245,8 +249,46 @@ class GUIActions():
             domainname = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             LSTLog.debug(domainname)
         except Exception as e:
-            LSTLog.warning("Unable to retrive system domain name.", e)
+            LSTLog.error("Unable to retrive system domain name.", e)
         return domainname
+
+    def killproc(proc=None):
+        LSTLog.debug("killproc function.")
+
+    def spawnproc(proc=None):
+        LSTLog.debug("spawnproc function.")
+        spawnprocwindow = tk.Toplevel(root)
+        spawnprocwindow.title(GlobalVars.LSTFULLNAME)
+        ico = Image.open(GlobalVars.MAINICO)
+        photo = ImageTk.PhotoImage(ico)
+        spawnprocwindow.wm_iconphoto(False, photo)
+        spawnprocttlfrm = tk.LabelFrame(spawnprocwindow, text = "Spawn Process")
+        spawnprocttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=3)
+        spawnprocauthorlbl = tk.Label(spawnprocttlfrm, text ="Process to Spawn:")
+        spawnprocauthorlbl.grid(column= 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
+        spawnprocentry = tk.Entry(spawnprocttlfrm, textvariable=GlobalVars.PROC)
+        spawnprocentry.grid(column=1, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
+    
+    def enablesvc(svc=None):
+        LSTLog.debug("enablesvc function.")
+    
+    def disablesvc(svc=None):
+        LSTLog.debug("disablesvc function.")
+    
+    def startsvc(svc=None):
+        LSTLog.debug("startsvc function.")
+    
+    def stopsvc(svc=None):
+        LSTLog.debug("stopsvc function.")
+
+    def newuser(user=None):
+        LSTLog.debug("newuser function.")
+    
+    def disableuser(user=None):
+        LSTLog.debug("disableuser function.")
+    
+    def deluser(user=None):
+        LSTLog.debug("deluser function.")
 
     def selectinterface():
         LSTLog.info("Select Interface Function.")
@@ -298,7 +340,7 @@ class GUIActions():
         BuildGUI.txoverrunscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.txfrmcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.txcolscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        #getroutetable()
+        GUIActions.getroutetable()
     
     def getroutetable():
         LSTLog.debug("Get route table.")
@@ -325,7 +367,7 @@ class NetToolbox():
         toolboxwindow = tk.Toplevel(root)
         toolboxwindow.title(GlobalVars.LSTFULLNAME)
         toolboxwindow.geometry("700x500")
-        ico = Image.open('hand-tool.png')
+        ico = Image.open(GlobalVars.MAINICO)
         photo = ImageTk.PhotoImage(ico)
         toolboxwindow.wm_iconphoto(False, photo)
         Toolboxnb = ttk.Notebook(toolboxwindow)
@@ -479,8 +521,8 @@ class NetToolbox():
 
 class BuildGUI():
     root.title(GlobalVars.LSTFULLNAME)
-    root.geometry("590x675")
-    ico = Image.open('hand-tool.png')
+    root.geometry("650x800")
+    ico = Image.open(GlobalVars.MAINICO)
     photo = ImageTk.PhotoImage(ico)
     root.wm_iconphoto(False, photo)
     LSTnb = ttk.Notebook(root)
@@ -526,7 +568,7 @@ class BuildGUI():
     proctabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
     killprocbtn = tk.Button(proctabbtnfrm, text="Kill Process", width = GlobalVars.BTNSIZE)
     killprocbtn.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
-    spawnprocbtn = tk.Button(proctabbtnfrm, text="Spawn Process", width = GlobalVars.BTNSIZE)
+    spawnprocbtn = tk.Button(proctabbtnfrm, text="Spawn Process", width = GlobalVars.BTNSIZE, command=GUIActions.spawnproc)
     spawnprocbtn.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     svcstabttlfrm = tk.LabelFrame(servicestab, text="System Services:")
     svcstabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
@@ -534,13 +576,13 @@ class BuildGUI():
     svcstabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
     svcstabbtnfrm = tk.Frame(servicestab)
     svcstabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
-    enablesvcbtn = tk.Button(svcstabbtnfrm, text="Enable Service", width = GlobalVars.BTNSIZE)
+    enablesvcbtn = tk.Button(svcstabbtnfrm, text="Enable Service", width = GlobalVars.BTNSIZE, command=GUIActions.enablesvc)
     enablesvcbtn.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
-    disablesvcbtn = tk.Button(svcstabbtnfrm, text="Disable Service", width = GlobalVars.BTNSIZE)
+    disablesvcbtn = tk.Button(svcstabbtnfrm, text="Disable Service", width = GlobalVars.BTNSIZE, command=GUIActions.disablesvc)
     disablesvcbtn.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
-    startsvcbtn = tk.Button(svcstabbtnfrm, text="Start Service", width = GlobalVars.BTNSIZE)
+    startsvcbtn = tk.Button(svcstabbtnfrm, text="Start Service", width = GlobalVars.BTNSIZE, command=GUIActions.startsvc)
     startsvcbtn.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
-    stopsvcbtn = tk.Button(svcstabbtnfrm, text="Stop Service", width = GlobalVars.BTNSIZE)
+    stopsvcbtn = tk.Button(svcstabbtnfrm, text="Stop Service", width = GlobalVars.BTNSIZE, command=GUIActions.stopsvc)
     stopsvcbtn.grid(column = 0, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     usrtabttlfrm = tk.LabelFrame(userstab, text="Logged In Users:")
     usrtabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
@@ -552,8 +594,12 @@ class BuildGUI():
     usrtabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
     usrtabbtnfrm = tk.Frame(userstab)
     usrtabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
-    newuserbtn = tk.Button(usrtabbtnfrm, text="New User", width = GlobalVars.BTNSIZE)
+    newuserbtn = tk.Button(usrtabbtnfrm, text="New User", width = GlobalVars.BTNSIZE, command=GUIActions.newuser)
     newuserbtn.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
+    disableuserbtn = tk.Button(usrtabbtnfrm, text="Disable User", width = GlobalVars.BTNSIZE, command=GUIActions.disableuser)
+    disableuserbtn.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
+    deluserbtn = tk.Button(usrtabbtnfrm, text="Remove User", width = GlobalVars.BTNSIZE, command=GUIActions.deluser)
+    deluserbtn.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     nettabcontfrm = tk.Frame(nettab)
     nettabcontfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
     nettabbtnfrm = tk.Frame(nettab)
