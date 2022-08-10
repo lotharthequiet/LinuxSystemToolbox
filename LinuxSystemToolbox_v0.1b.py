@@ -44,7 +44,7 @@ INTLIST = INTLIST.split()
 root = tk.Tk()
 
 class GlobalVars(object):
-    LSTVER = "0.1b3"                                                                        #Sytem Version number
+    LSTVER = "0.1b4"                                                                        #Sytem Version number
     LSTNAME = "Linux System Toolbox"                                                        #Application Name
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"                                                           #Application Author
@@ -117,7 +117,7 @@ class GUIActions():
         helpauthorlbl.grid(column= 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
 
     def openabout():
-        LSTLog.debug(GlobalVars.LSTFULLNAME)
+        LSTLog.debug("Open About Window.")
         aboutwindow = tk.Toplevel(root)
         aboutwindow.title(GlobalVars.LSTFULLNAME)
         ico = Image.open('hand-tool.png')
