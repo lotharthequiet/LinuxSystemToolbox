@@ -45,7 +45,7 @@ INTLIST = INTLIST.split()
 root = tk.Tk()
 
 class GlobalVars(object):
-    LSTVER = "0.1b4"                                                                        #Sytem Version number
+    LSTVER = "0.1b5"                                                                        #Sytem Version number
     LSTNAME = "Linux System Toolbox"                                                        #Application Name
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"                                                           #Application Author
