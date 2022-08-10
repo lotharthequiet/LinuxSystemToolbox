@@ -19,6 +19,8 @@ WARNING: (Default level) Indication things are not so good
 ERROR: More serious prob preventing app from running
 CRITICAL: Serious error
 """
+from ast import Global
+from dis import dis
 import tkinter as tk
 import logging
 import subprocess
@@ -149,27 +151,6 @@ class GUIActions():
         aboutverlbl.grid(column = 0, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
         aboutver = tk.Label(aboutwinttlfrm, text = GlobalVars.LSTVER)
         aboutver.grid(column = 1, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
-    
-    def toggleinterface():
-        LSTLog.debug("Toggle Interface")
-        LSTLog.debug(GlobalVars.CURRENTINTSTAT)
-        if GlobalVars.CURRENTINTSTAT == "UP":
-            try:
-                subprocess.Popen("sudo ifconfig ", GlobalVars.CURRENTINT, " down", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-                LSTLog.debug("")
-            except Exception as e:
-                LSTLog.error("Unable to disable interface: ", GlobalVars.CURRENTINT, e)
-        else:
-            try:
-                subprocess.Popen("sudo ifconfig ", GlobalVars.CURRENTINT, " up", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-            except Exception as e:
-                LSTLog.error("Unable to enable interface: ", GlobalVars.CURRENTINT, e)
-
-    def dhcprelease():
-        LSTLog.info("DHCP Release")
-
-    def dhcprenew():
-        LSTLog.info("DHCP Renew")
 
     def getmacaddr(addr=None):
         LSTLog.debug("getmacaddr function.")
@@ -293,6 +274,51 @@ class GUIActions():
     def deluser(user=None):
         LSTLog.debug("deluser function.")
 
+    def toggleinterface():
+        LSTLog.debug("Toggle Interface")
+        LSTLog.debug(GlobalVars.CURRENTINTSTAT)
+        if GlobalVars.CURRENTINTSTAT == "UP":
+            try:
+                subprocess.Popen("sudo ifconfig ", GlobalVars.CURRENTINT, " down", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+                LSTLog.debug("")
+            except Exception as e:
+                LSTLog.error("Unable to disable interface: ", GlobalVars.CURRENTINT, e)
+        else:
+            try:
+                subprocess.Popen("sudo ifconfig ", GlobalVars.CURRENTINT, " up", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+            except Exception as e:
+                LSTLog.error("Unable to enable interface: ", GlobalVars.CURRENTINT, e)
+
+    def dhcprelease():
+        LSTLog.info("DHCP Release")
+
+    def dhcprenew():
+        LSTLog.info("DHCP Renew")
+
+    def refreshintstats(intstats=None):
+        LSTLog.info("refreshintstats function.")
+        LSTLog.debug(GlobalVars.CURRENTINT)
+        try:
+            intstats[0] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[1] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[2] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[3] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[4] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[5] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[6] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX Errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[7] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[8] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX packets' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[9] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX packets' | awk {'print$6'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[10] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[11] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$5'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[12] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[13] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstats[14] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            LSTLog.debug(intstats)
+        except Exception as e:
+            LSTLog.error("Unable to refresh stats for int: ", GlobalVars.CURRENTINT, e)
+        return intstats
+
     def selectinterface():
         LSTLog.info("Select Interface Function.")
         GlobalVars.CURRENTINT = BuildGUI.intcombo.get()
@@ -344,6 +370,9 @@ class GUIActions():
         BuildGUI.txfrmcntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.txcolscntlbl['text'] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         GUIActions.getroutetable()
+        BuildGUI.dhcpreleasebtn.config(state="normal")
+        BuildGUI.dhcprenewbtn.config(state="normal")
+        BuildGUI.refreshbtn.config(state="normal")
     
     def getroutetable():
         LSTLog.debug("Get route table.")
@@ -405,7 +434,7 @@ class NetToolbox():
         configtabcontfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
         configtabbtnfrm = tk.Frame(configtab)
         configtabbtnfrm.grid(column = 1, row = 0, padx = 0, pady = (10, 5), sticky='N')
-        disableintbtn = tk.Button(configtabbtnfrm, text ="Disable", width = GlobalVars.BTNSIZE, command=GUIActions.toggleinterface)
+        disableintbtn = tk.Button(configtabbtnfrm, text ="Disable", width = GlobalVars.BTNSIZE, command=GUIActions.toggleinterface, state="disabled")
         disableintbtn.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
         intlbl = tk.Label(configtabcontfrm, text ="Select Interface:")
         intlbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
@@ -532,7 +561,7 @@ class BuildGUI():
     menubar = tk.Menu(LSTnb)
     menubar = tk.Menu(LSTnb)
     filemenu = tk.Menu(menubar, tearoff=0)                                     
-    filemenu.add_command(label="Reports", command=GUIActions.runreports)
+    filemenu.add_command(label="System Reports", command=GUIActions.runreports)
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=GUIActions.exitapp)
     menubar.add_cascade(label="File", menu=filemenu)
@@ -611,14 +640,16 @@ class BuildGUI():
     intstatsfrm.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICFULLFRMSTICKY, columnspan = 2)
     routetblfrm = tk.LabelFrame(nettab, text="Routing Table:")
     routetblfrm.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICFULLFRMSTICKY, columnspan = 2)
-    disableintbtn = tk.Button(nettabbtnfrm, text ="Disable", width = GlobalVars.BTNSIZE, command=GUIActions.toggleinterface)
+    disableintbtn = tk.Button(nettabbtnfrm, text ="Disable", width = GlobalVars.BTNSIZE, command=GUIActions.toggleinterface, state="disabled")
     disableintbtn.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
-    dhcpreleasebtn = tk.Button(nettabbtnfrm, text ="DHCP Release", width = GlobalVars.BTNSIZE, command=GUIActions.dhcprelease)
+    dhcpreleasebtn = tk.Button(nettabbtnfrm, text ="DHCP Release", width = GlobalVars.BTNSIZE, command=GUIActions.dhcprelease, state="disabled")
     dhcpreleasebtn.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
-    dhcprenewbtn = tk.Button(nettabbtnfrm, text ="DHCP Renew", width = GlobalVars.BTNSIZE, command=GUIActions.dhcprenew)
+    dhcprenewbtn = tk.Button(nettabbtnfrm, text ="DHCP Renew", width = GlobalVars.BTNSIZE, command=GUIActions.dhcprenew, state="disabled")
     dhcprenewbtn.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     nettoolboxbtn = tk.Button(nettabbtnfrm, text ="Net Toolbox", width = GlobalVars.BTNSIZE, command=NetToolbox.Open)
     nettoolboxbtn.grid(column = 0, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
+    refreshbtn = tk.Button(nettabbtnfrm, text = "Refresh Stats", width = GlobalVars.BTNSIZE, command=GUIActions.refreshintstats, state="disabled")
+    refreshbtn.grid(column = 0, row = 4, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     selintname = tk.StringVar()
     intlbl = tk.Label(nettabcontfrm, text ="Select Interface:")
     intlbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
@@ -705,23 +736,23 @@ class BuildGUI():
     txerrorslbl = tk.Label(intstatsfrm, text="TX errors")
     txerrorslbl.grid(column = 0, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICSTICKY)
     txerrorscntlbl = tk.Label(intstatsfrm, text="")
-    txerrorscntlbl.grid(column = 1, row = 3, sticky = GlobalVars.STATICSTICKY)
+    txerrorscntlbl.grid(column = 1, row = 3, sticky = "S")
     txdroppedlbl = tk.Label(intstatsfrm, text="dropped")
     txdroppedlbl.grid(column = 2, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICSTICKY)
     txdroppedcntlbl = tk.Label(intstatsfrm, text="")
-    txdroppedcntlbl.grid(column = 3, row = 3, sticky = GlobalVars.STATICSTICKY)
+    txdroppedcntlbl.grid(column = 3, row = 3, sticky = "S")
     txoverrunslbl = tk.Label(intstatsfrm, text="overruns")
     txoverrunslbl.grid(column = 4, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICSTICKY)
     txoverrunscntlbl = tk.Label(intstatsfrm, text="")
-    txoverrunscntlbl.grid(column = 5, row = 3, sticky = GlobalVars.STATICSTICKY)
+    txoverrunscntlbl.grid(column = 5, row = 3, sticky = "S")
     txfrmlbl = tk.Label(intstatsfrm, text="carrier")
     txfrmlbl.grid(column = 6, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICSTICKY)
     txfrmcntlbl = tk.Label(intstatsfrm, text="")
-    txfrmcntlbl.grid(column = 7, row = 3, sticky = GlobalVars.STATICSTICKY)
+    txfrmcntlbl.grid(column = 7, row = 3, sticky = "S")
     txcolslbl = tk.Label(intstatsfrm, text="collisions")
     txcolslbl.grid(column = 8, row = 3, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky = GlobalVars.STATICSTICKY)
     txcolscntlbl = tk.Label(intstatsfrm, text="")
-    txcolscntlbl.grid(column = 9, row = 3, sticky = GlobalVars.STATICSTICKY)
+    txcolscntlbl.grid(column = 9, row = 3)
     routetablecontlbl = tk.Label(routetblfrm, text = "Destination")
     routetablecontlbl.grid(column = 0, row = 0, padx = GlobalVars.NARROWPAD, pady = GlobalVars.NARROWPAD, sticky = GlobalVars.STATICSTICKY)
     routetablecontlbl2 = tk.Label(routetblfrm, text = "Gateway")
