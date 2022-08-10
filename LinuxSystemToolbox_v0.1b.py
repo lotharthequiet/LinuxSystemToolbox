@@ -2,11 +2,12 @@
 *********************************************************************************
 |                                                                               |
 |                             Linux System Toolbox                              |
-|                 -------------------------------------------                   |   
+|                 --------------------------------------------                  |   
 |                         Written by: Lothar TheQuiet                           |
 |                          lotharthequiet@gmail.com                             |
 |                   Graphing Logic Assitance: Tai Gong Quan                     |
 |                      Hounding about caMELCase: Rilvyk                         |
+|                 Randomly Odd/Tasteless/Weird Jokes: Rleonekc                  |
 |                                                                               |
 *********************************************************************************
 
@@ -268,6 +269,9 @@ class GUIActions():
         spawnprocauthorlbl.grid(column= 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
         spawnprocentry = tk.Entry(spawnprocttlfrm, textvariable=GlobalVars.PROC)
         spawnprocentry.grid(column=1, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
+        spawnprocbrowsebtn = tk.Button(spawnprocttlfrm, image=GlobalVars.BROWSEICO)
+        spawnprocbrowsebtn.grid(column=2, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
+        
     
     def enablesvc(svc=None):
         LSTLog.debug("enablesvc function.")
