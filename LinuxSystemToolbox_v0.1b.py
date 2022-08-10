@@ -24,7 +24,7 @@ import subprocess
 
 from tkinter import DISABLED, ttk
 from re import search
-
+from PIL import Image, ImageTk
 
 LSTLog = logging.getLogger(__name__) 
 LSTLog.setLevel(logging.DEBUG)
@@ -44,7 +44,7 @@ INTLIST = INTLIST.split()
 root = tk.Tk()
 
 class GlobalVars(object):
-    LSTVER = "0.1b"                                                                         #Sytem Version number
+    LSTVER = "0.1b3"                                                                        #Sytem Version number
     LSTNAME = "Linux System Toolbox"                                                        #Application Name
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"                                                           #Application Author
@@ -80,6 +80,9 @@ class GUIActions():
         LSTLog.debug("Open System Reports Window.")
         reportwindow = tk.Toplevel(root)
         reportwindow.title(GlobalVars.LSTFULLNAME)
+        ico = Image.open('hand-tool.png')
+        photo = ImageTk.PhotoImage(ico)
+        reportwindow.wm_iconphoto(False, photo)
         reportwinttlfrm = tk.LabelFrame(reportwindow, text = "System Reports")
         reportwinttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=3)
         reportauthorlbl = tk.Label(reportwinttlfrm, text ="Written By:")
@@ -105,6 +108,9 @@ class GUIActions():
         LSTLog.debug("Open Help Window.")
         helpwindow = tk.Toplevel(root)
         helpwindow.title(GlobalVars.LSTFULLNAME)
+        ico = Image.open('hand-tool.png')
+        photo = ImageTk.PhotoImage(ico)
+        helpwindow.wm_iconphoto(False, photo)
         helpwinttlfrm = tk.LabelFrame(helpwindow, text = "Help")
         helpwinttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
         helpauthorlbl = tk.Label(helpwinttlfrm, text ="Written By:")
@@ -114,6 +120,9 @@ class GUIActions():
         LSTLog.debug(GlobalVars.LSTFULLNAME)
         aboutwindow = tk.Toplevel(root)
         aboutwindow.title(GlobalVars.LSTFULLNAME)
+        ico = Image.open('hand-tool.png')
+        photo = ImageTk.PhotoImage(ico)
+        aboutwindow.wm_iconphoto(False, photo)
         aboutwinttlfrm = tk.LabelFrame(aboutwindow, text = "About")
         aboutwinttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
         aboutauthorlbl = tk.Label(aboutwinttlfrm, text ="Written By:")
@@ -244,7 +253,7 @@ class GUIActions():
         GlobalVars.CURRENTINT = BuildGUI.intcombo.get()
         LSTLog.debug(GlobalVars.CURRENTINT)
         try:
-            intstatus = subprocess.Popen("netstat -r | tail -n +3 | awk '{print$2}' | head -n +1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+            intstatus = subprocess.Popen("ip a sh dev " + GlobalVars.CURRENTINT + " | head -n 1 | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         except Exception as e: 
             LSTLog.error("Unable to retrieve current interface status. ", e)
         if search("UP", intstatus):
@@ -316,6 +325,9 @@ class NetToolbox():
         toolboxwindow = tk.Toplevel(root)
         toolboxwindow.title(GlobalVars.LSTFULLNAME)
         toolboxwindow.geometry("700x500")
+        ico = Image.open('hand-tool.png')
+        photo = ImageTk.PhotoImage(ico)
+        toolboxwindow.wm_iconphoto(False, photo)
         Toolboxnb = ttk.Notebook(toolboxwindow)
         configtab = tk.Frame(Toolboxnb)
         dhcptab = tk.Frame(Toolboxnb)
@@ -468,6 +480,9 @@ class NetToolbox():
 class BuildGUI():
     root.title(GlobalVars.LSTFULLNAME)
     root.geometry("590x675")
+    ico = Image.open('hand-tool.png')
+    photo = ImageTk.PhotoImage(ico)
+    root.wm_iconphoto(False, photo)
     LSTnb = ttk.Notebook(root)
     menubar = tk.Menu(LSTnb)
     menubar = tk.Menu(LSTnb)
