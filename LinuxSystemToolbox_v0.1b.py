@@ -24,7 +24,7 @@ import tksheet
 import logging
 import subprocess
 
-from tkinter import DISABLED, ttk
+from tkinter import DISABLED, Canvas, ttk
 from re import search
 from PIL import Image, ImageTk
 
@@ -47,7 +47,7 @@ WRLSSINTLIST = None
 root = tk.Tk()
 
 class GlobalVars(object):
-    LSTVER = "0.1b12"                                                                        #Sytem Version number
+    LSTVER = "0.1a16"                                                                        #Sytem Version number
     LSTNAME = "Linux System Toolbox"                                                        #Application Name
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"                                                           #Application Author
@@ -133,6 +133,17 @@ class GUIActions():
         aboutwindow.wm_iconphoto(False, photo)
         aboutwinttlfrm = tk.LabelFrame(aboutwindow, text = "About")
         aboutwinttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
+        #aboutimg = ImageTk.PhotoImage(ico)
+        #aboutimglbl = tk.Label(aboutwinttlfrm, image = photo)
+        #aboutimglbl.grid(column=0, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
+        img = Image.open(GlobalVars.MAINICO)
+        img.resize((128, 128))
+        image = ImageTk.PhotoImage(img)
+        aboutcanvas = Canvas(aboutwinttlfrm, width=128, height=128)
+        aboutcanvas.create_image(128, 128, image = image)
+        aboutcanvas.grid(column=0, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
+        aboutttllbl = tk.Label(aboutwinttlfrm, text=GlobalVars.LSTFULLNAME)
+        aboutttllbl.grid(column=1, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky="SW")
         aboutauthorlbl = tk.Label(aboutwinttlfrm, text ="Written By:")
         aboutauthorlbl.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
         aboutauthor = tk.Label(aboutwinttlfrm, text = GlobalVars.LSTAUTHOR)
@@ -601,7 +612,7 @@ class BuildGUI():
     proctabttlfrm = tk.LabelFrame(proctab, text="Running Processes:")
     proctabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
     procsht = tksheet.Sheet(proctabttlfrm)
-    procsht.grid()
+    procsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     procsht.enable_bindings(("row_select"))
     proctabbtnfrm = tk.Frame(proctab)
     proctabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
@@ -612,7 +623,7 @@ class BuildGUI():
     svcstabttlfrm = tk.LabelFrame(servicestab, text="System Services:")
     svcstabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
     svcssht = tksheet.Sheet(svcstabttlfrm)
-    svcssht.grid()
+    svcssht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     svcssht.enable_bindings(("row_select"))
     svcstabbtnfrm = tk.Frame(servicestab)
     svcstabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
@@ -629,10 +640,10 @@ class BuildGUI():
     lclusrtabttlfrm = tk.LabelFrame(userstab, text="Local Users:")
     lclusrtabttlfrm.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
     currentusrsht = tksheet.Sheet(usrtabttlfrm)
-    currentusrsht.grid()
+    currentusrsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     currentusrsht.enable_bindings(("row_select"))
     lclusrsht = tksheet.Sheet(lclusrtabttlfrm)
-    lclusrsht.grid()
+    lclusrsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     lclusrsht.enable_bindings(("row_select"))
     usrtabbtnfrm = tk.Frame(userstab)
     usrtabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
@@ -795,7 +806,40 @@ class BuildGUI():
     perftabmemhist.grid(column = 1, row = 1, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=3)
     perftabttllbl = tk.Label(perftabmemhist, text="Test Label")
     perftabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
-    
+    perftabtotalsfrm = tk.LabelFrame(perftab, text="Totals")
+    perftabtotalsfrm.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=2)
+    perftabttllbl = tk.Label(perftabtotalsfrm, text="Test Label")
+    perftabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabphysmemfrm = tk.LabelFrame(perftab, text="Physical Memory (K)")
+    perftabphysmemfrm.grid(column = 3, row = 2, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=2)
+    perftabttllbl = tk.Label(perftabphysmemfrm, text="Test Label")
+    perftabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabtotalsfrm = tk.LabelFrame(perftab, text="Commit Charge (K)")
+    perftabtotalsfrm.grid(column = 0, row = 3, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=2)
+    perftabttllbl = tk.Label(perftabtotalsfrm, text="Test Label")
+    perftabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabphysmemfrm = tk.LabelFrame(perftab, text="Kernel Memory (K)")
+    perftabphysmemfrm.grid(column = 3, row = 3, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=2)
+    perftabttllbl = tk.Label(perftabphysmemfrm, text="Test Label")
+    perftabttllbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatslblfrm = tk.Frame(perftab)
+    perftabstatslblfrm.grid(column = 0, row = 4, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=4)
+    perftabstatsproclbl = tk.Label(perftabstatslblfrm, text="Processes:")
+    perftabstatsproclbl.grid(column=0, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatsproc = tk.Label(perftabstatslblfrm)
+    perftabstatsproc.grid(column=1, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatscpulbl = tk.Label(perftabstatslblfrm, text="CPU Usage:")
+    perftabstatscpulbl.grid(column=2, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatscpu = tk.Label(perftabstatslblfrm)
+    perftabstatscpu.grid(column=3, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatmemuselbl = tk.Label(perftabstatslblfrm, text="Mem Usage:")
+    perftabstatmemuselbl.grid(column=4, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatmemuse = tk.Label(perftabstatslblfrm)
+    perftabstatmemuse.grid(column=5, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatmemuselbl2 = tk.Label(perftabstatslblfrm, text="/")
+    perftabstatmemuselbl2.grid(column=6, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabstatmemusetotal = tk.Label(perftabstatslblfrm)
+    perftabstatmemusetotal.grid(column=7, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
     wrlssintlbl = tk.Label(wrlsstab, text ="WLAN Interface Name:")
     wrlssintlbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NW')
     wrlssintcombo = ttk.Combobox(wrlsstab, values = WRLSSINTLIST)
@@ -807,7 +851,7 @@ class BuildGUI():
     wrlssavailtabttlfrm = tk.LabelFrame(wrlsstab, text="Available Networks:")
     wrlssavailtabttlfrm.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
     wrlssavail = tksheet.Sheet(wrlssavailtabttlfrm)
-    wrlssavail.grid()
+    wrlssavail.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     wrlssavail.enable_bindings(("row_select"))
     wrlsstabbtnfrm = tk.Frame(wrlsstab)
     wrlsstabbtnfrm.grid(column = 3, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N', rowspan=2)
