@@ -77,6 +77,7 @@ class GlobalVars(object):
     PROC = tk.StringVar()
     MAINICO = "tools.png"
     BROWSEICO = "browse.png"
+    memused = 0
 """
 class LSTLog():
     def init_log()
@@ -418,6 +419,25 @@ class GUIActions():
     
     def selwrlssint():
         LSTLog.debug("selwrlssint function.")
+
+    def getmemoryinfo():
+        LSTLog.debug("getmemoryinfo function")
+        BuildGUI.perftabmemtotal['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$2'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.perftabmemavail['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$7'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.perftabstatmemuse['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$3'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.perftabstatmemusetotal['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$2'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.perftabmemcache['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$6'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.perftabswaptotal['text'] = subprocess.Popen("free | tail -n 1 | awk {'print$2'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        GlobalVars.memused = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$3'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        GlobalVars.memused = GlobalVars.memused + " MB"
+        BuildGUI.memcanvas.create_text(64, 110, text=GlobalVars.memused, fill='#66ff33', font=('Cantarell Regular', 12))
+        BuildGUI.perftabswapused['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$3'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        BuildGUI.perftabswapfree['text'] = subprocess.Popen("free | tail -n 1 | awk {'print$4'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        LSTLog.debug(GlobalVars.memused)
+
+    def getprocinfo():
+        LSTLog.debug("getprocinfo function")
+        BuildGUI.perftabstatsproc['text'] = subprocess.Popen("ps -aux | wc -l  | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
 
 class NetToolbox():
     def Open():
@@ -835,7 +855,7 @@ class BuildGUI():
     memcanvas.create_text(64, 70, text="_______", fill='#1a6600', font=('Cantarell Regular', 11, 'bold'))
     memcanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 11, 'bold'))
     memcanvas.create_text(64, 80, text="_______", fill='#66ff33', font=('Cantarell Regular', 11, 'bold'))
-    memcanvas.create_text(64, 110, text="27140K", fill='#66ff33', font=('Cantarell Regular', 14))
+    #memcanvas.create_text(64, 110, text=GlobalVars.memused, fill='#66ff33', font=('Cantarell Regular', 14))
     #memcanvas.create_image(128, 192)
     memcanvas.grid(column=0, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
     perftabmemhist = tk.LabelFrame(perftab, text="Memory Usage History")
@@ -857,7 +877,7 @@ class BuildGUI():
     perftabprocslbl.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
     perftabprocs = tk.Label(perftabtotalsfrm)
     perftabprocs.grid(column = 1, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky='E')
-    perftabphysmemfrm = tk.LabelFrame(perftab, text="Physical Memory (K)")
+    perftabphysmemfrm = tk.LabelFrame(perftab, text="Physical Memory (MB)")
     perftabphysmemfrm.grid(column = 2, row = 2, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=2)
     perftabmemtotallbl = tk.Label(perftabphysmemfrm, text="Total:")
     perftabmemtotallbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
@@ -867,7 +887,7 @@ class BuildGUI():
     perftabmemavaillbl.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
     perftabmemavail = tk.Label(perftabphysmemfrm)
     perftabmemavail.grid(column = 1, row = 1, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabmemcachelbl = tk.Label(perftabphysmemfrm, text="File Cache:")
+    perftabmemcachelbl = tk.Label(perftabphysmemfrm, text="Buff/Cache:")
     perftabmemcachelbl.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
     perftabmemcache = tk.Label(perftabphysmemfrm)
     perftabmemcache.grid(column = 1, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
@@ -885,20 +905,20 @@ class BuildGUI():
     perftabcommitpeaklbl.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
     perftabcommitpeak = tk.Label(perftabtotalsfrm)
     perftabcommitpeak.grid(column = 1, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabphysmemfrm = tk.LabelFrame(perftab, text="Kernel Memory (K)")
+    perftabphysmemfrm = tk.LabelFrame(perftab, text="Swap Memory (MB)")
     perftabphysmemfrm.grid(column = 2, row = 3, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=2)
-    perftabkerneltotallbl = tk.Label(perftabphysmemfrm, text="Total:")
-    perftabkerneltotallbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabkerneltotal = tk.Label(perftabphysmemfrm)
-    perftabkerneltotal.grid(column = 1, row = 0, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabkernelpagedlbl = tk.Label(perftabphysmemfrm, text="Paged:")
-    perftabkernelpagedlbl.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabkernelpaged = tk.Label(perftabphysmemfrm)
-    perftabkernelpaged.grid(column = 1, row = 1, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabkernelnonpagedlbl = tk.Label(perftabphysmemfrm, text="Nonpaged:")
-    perftabkernelnonpagedlbl.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
-    perftabkernelnonpaged = tk.Label(perftabphysmemfrm)
-    perftabkernelnonpaged.grid(column = 1, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabswaptotallbl = tk.Label(perftabphysmemfrm, text="Total:")
+    perftabswaptotallbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabswaptotal = tk.Label(perftabphysmemfrm)
+    perftabswaptotal.grid(column = 1, row = 0, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabswapusedlbl = tk.Label(perftabphysmemfrm, text="Used:")
+    perftabswapusedlbl.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabswapused = tk.Label(perftabphysmemfrm)
+    perftabswapused.grid(column = 1, row = 1, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabswapfreelbl = tk.Label(perftabphysmemfrm, text="Free:")
+    perftabswapfreelbl.grid(column = 0, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
+    perftabswapfree = tk.Label(perftabphysmemfrm)
+    perftabswapfree.grid(column = 1, row = 2, padx = GlobalVars.DEFPADX, pady = (5, 5), sticky=GlobalVars.STATICSTICKY)
     perftabstatslblfrm = tk.Frame(perftab)
     perftabstatslblfrm.grid(column = 0, row = 4, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NEW', columnspan=4)
     perftabstatsproclbl = tk.Label(perftabstatslblfrm, text="Processes:")
@@ -988,5 +1008,7 @@ class BuildGUI():
     wrlsssignal = tk.Label(wrlsstabttlfrm)
     wrlsssignal.grid(column = 3, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
 
+GUIActions.getmemoryinfo()
+GUIActions.getprocinfo()
 app=BuildGUI()
 root.mainloop()
