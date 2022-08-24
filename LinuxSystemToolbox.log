@@ -2419,3 +2419,95 @@
 2022-08-23 23:01:51,571:DEBUG:getmemoryinfo function
 2022-08-23 23:01:51,650:DEBUG:2941368 MB
 2022-08-23 23:01:51,650:DEBUG:getprocinfo function
+2022-08-23 23:12:26,600:DEBUG:Starting LST...
+2022-08-23 23:12:27,304:DEBUG:getmemoryinfo function
+2022-08-23 23:12:27,426:DEBUG:getprocinfo function
+2022-08-23 23:41:16,899:DEBUG:Starting LST...
+2022-08-23 23:41:17,543:DEBUG:getmemoryinfo function
+2022-08-23 23:41:17,626:DEBUG:getprocinfo function
+2022-08-23 23:41:35,434:DEBUG:Starting LST...
+2022-08-23 23:41:36,012:DEBUG:getmemoryinfo function
+2022-08-23 23:41:36,087:DEBUG:getprocinfo function
+2022-08-23 23:42:03,652:DEBUG:Starting LST...
+2022-08-23 23:42:04,369:DEBUG:getmemoryinfo function
+2022-08-23 23:42:04,446:DEBUG:getprocinfo function
+2022-08-23 23:42:22,527:DEBUG:Starting LST...
+2022-08-23 23:42:23,123:DEBUG:getmemoryinfo function
+2022-08-23 23:42:23,204:DEBUG:getprocinfo function
+2022-08-23 23:43:45,837:DEBUG:Starting LST...
+2022-08-23 23:43:46,474:DEBUG:getmemoryinfo function
+2022-08-23 23:43:46,554:DEBUG:getprocinfo function
+2022-08-23 23:45:03,780:DEBUG:Starting LST...
+2022-08-23 23:45:04,395:DEBUG:getmemoryinfo function
+2022-08-23 23:45:04,478:DEBUG:getprocinfo function
+2022-08-23 23:45:28,203:DEBUG:Starting LST...
+2022-08-23 23:45:28,792:DEBUG:getmemoryinfo function
+2022-08-23 23:45:28,922:DEBUG:getprocinfo function
+2022-08-23 23:46:59,173:DEBUG:Starting LST...
+2022-08-23 23:46:59,780:DEBUG:getmemoryinfo function
+2022-08-23 23:46:59,905:DEBUG:getprocinfo function
+2022-08-23 23:47:19,774:DEBUG:Starting LST...
+2022-08-23 23:47:20,427:DEBUG:getmemoryinfo function
+2022-08-23 23:47:20,507:DEBUG:getprocinfo function
+2022-08-23 23:47:55,510:DEBUG:Starting LST...
+2022-08-23 23:47:56,149:DEBUG:getmemoryinfo function
+2022-08-23 23:47:56,217:DEBUG:getprocinfo function
+2022-08-23 23:49:17,615:DEBUG:Starting LST...
+2022-08-23 23:49:18,254:DEBUG:getmemoryinfo function
+2022-08-23 23:49:18,333:DEBUG:getprocinfo function
+2022-08-23 23:49:55,007:DEBUG:Starting LST...
+2022-08-23 23:49:55,637:DEBUG:getmemoryinfo function
+2022-08-23 23:49:55,715:DEBUG:getprocinfo function
+2022-08-24 00:03:08,729:DEBUG:Starting LST...
+2022-08-24 00:03:09,467:DEBUG:getmemoryinfo function
+2022-08-24 00:03:09,547:DEBUG:getprocinfo function
+2022-08-24 00:03:09,592:DEBUG:drawcpugraph function
+2022-08-24 00:06:01,693:DEBUG:Starting LST...
+2022-08-24 00:06:02,461:DEBUG:getmemoryinfo function
+2022-08-24 00:06:02,553:DEBUG:getprocinfo function
+2022-08-24 00:06:02,596:DEBUG:drawcpugraph function
+2022-08-24 00:08:26,209:DEBUG:Starting LST...
+2022-08-24 00:08:26,931:DEBUG:getmemoryinfo function
+2022-08-24 00:08:27,019:DEBUG:getprocinfo function
+2022-08-24 00:08:27,063:DEBUG:drawcpugraph function
+2022-08-24 00:08:27,063:DEBUG:Cpu 10% or less
+2022-08-24 00:20:12,579:DEBUG:Starting LST...
+2022-08-24 00:20:13,437:DEBUG:getmemoryinfo function
+2022-08-24 00:20:13,539:DEBUG:getprocinfo function
+2022-08-24 00:20:13,609:DEBUG:drawcpugraph function
+2022-08-24 00:20:13,610:DEBUG:Cpu 10% or less
+2022-08-24 00:21:30,704:DEBUG:Starting LST...
+2022-08-24 00:21:31,301:DEBUG:getmemoryinfo function
+2022-08-24 00:21:31,375:DEBUG:getprocinfo function
+2022-08-24 00:21:31,416:DEBUG:drawcpugraph function
+2022-08-24 00:21:31,417:DEBUG:3
+2022-08-24 00:21:31,418:DEBUG:Cpu 10% or less
+2022-08-24 00:22:14,393:DEBUG:Starting LST...
+2022-08-24 00:22:15,205:DEBUG:getmemoryinfo function
+2022-08-24 00:22:15,321:DEBUG:getprocinfo function
+2022-08-24 00:22:15,367:DEBUG:drawcpugraph function
+2022-08-24 00:22:15,367:DEBUG:3
+2022-08-24 00:22:15,368:DEBUG:Cpu 10% or less
+2022-08-24 00:23:39,102:INFO:Select Interface Function.
+2022-08-24 00:23:39,103:DEBUG:eth0
+2022-08-24 00:23:39,110:INFO:Interface UP
+2022-08-24 00:23:39,111:DEBUG:getmacaddr function.
+2022-08-24 00:23:39,121:DEBUG:00:1c:42:9d:8c:46
+2022-08-24 00:23:39,122:DEBUG:getmtu function.
+2022-08-24 00:23:39,129:DEBUG:1500
+2022-08-24 00:23:39,129:DEBUG:getipaddr function.
+2022-08-24 00:23:39,140:DEBUG:10.0.1.11
+2022-08-24 00:23:39,140:DEBUG:getsubmask function.
+2022-08-24 00:23:39,149:DEBUG:255.255.255.0
+2022-08-24 00:23:39,150:DEBUG:getdefgw function.
+2022-08-24 00:23:39,162:DEBUG:255.255.255.0
+2022-08-24 00:23:39,162:DEBUG:getbcastaddr function.
+2022-08-24 00:23:39,170:DEBUG:10.0.1.255
+2022-08-24 00:23:39,171:DEBUG:getdnsserveraddr function.
+2022-08-24 00:23:39,178:DEBUG:10.0.1.1
+2022-08-24 00:23:39,178:DEBUG:gethostname function.
+2022-08-24 00:23:39,184:DEBUG:StingrayAlpha
+2022-08-24 00:23:39,184:DEBUG:getdomainname function.
+2022-08-24 00:23:39,192:DEBUG:tampabay.rr.com
+2022-08-24 00:23:39,333:DEBUG:Get route table.
+2022-08-24 00:26:00,576:DEBUG:Open About Window.
