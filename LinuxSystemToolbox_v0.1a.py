@@ -38,26 +38,10 @@ from tkinter import DISABLED, Canvas, ttk
 from re import search
 from PIL import Image, ImageTk
 
-LSTLog = logging.getLogger(__name__) 
-LSTLog.setLevel(logging.DEBUG)
-LSTLogfmt = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
-LSTLogh = logging.FileHandler('LinuxSystemToolbox.log')
-LSTLogh.setFormatter(LSTLogfmt)
-LSTLog.addHandler(LSTLogh)
-LSTLogstrm = logging.StreamHandler()
-LSTLogstrm.setFormatter(LSTLogfmt)
-LSTLog.addHandler(LSTLogstrm)
-LSTLog.debug("Starting LST...")
-try:
-    INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-except Exception as e:
-    LSTLog.error("Unable to retrieve interface list.", e)
-INTLIST = INTLIST.split()
-WRLSSINTLIST = None
 root = tk.Tk()
 
 class GlobalVars(object):
-    LSTVER = "0.1a21"                                                                       #Sytem Version number
+    LSTVER = "0.1a24"                                                                       #Sytem Version number
     LSTNAME = "Linux System Toolbox"                                                        #Application Name
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"                                                           #Application Author
@@ -80,25 +64,31 @@ class GlobalVars(object):
     memused = 0
     totalmem = 0
     cpuidle = 0
-"""
+
 class LSTLog():
-    def init_log()
-        LSTLogger = logging.getLogger(__name__)
-        LSTLogger.setLevel(logging.DEBUG)
-        LSTLoggerfmt = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
-        LSTLogh = logging.FileHandler('LinuxSystemToolbox.log')
-        LSTLogh.setFormatter(LSTLoggerfmt)
-        LSTLogger.addHandler(LSTLOGHANDLER)
+    Logger = logging.getLogger(__name__)
+    Logger.setLevel(logging.DEBUG)
+    Loggerfmt = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+    #Logh = logging.FileHandler('LinuxSystemToolbox.log')
+    Logh = logging.StreamHandler()
+    Logh.setFormatter(Loggerfmt)
+    Logger.addHandler(Logh)
 
-    def log_info(item, tags=None):
-        LSTLogger.info(item)
+try:
+    INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve interface list.", e)
+INTLIST = INTLIST.split()
+try: 
+    WRLSSINTLIST = subprocess.Popen("iw dev | awk '$1==\"Interface\"{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve wireless interface list.", e)
+WRLSSINTLIST = WRLSSINTLIST.split()
 
-    def log_debug(item, tags=None):
-        logg
-"""
+
 class GUIActions():
     def runreports():
-        LSTLog.debug("Open System Reports Window.")
+        LSTLog.Logger.debug("Open System Reports Window.")
         reportwindow = tk.Toplevel(root)
         reportwindow.title(GlobalVars.LSTFULLNAME)
         ico = Image.open(GlobalVars.MAINICO)
@@ -110,23 +100,23 @@ class GUIActions():
         reportauthorlbl.grid(column= 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
 
     def exitapp():
-        LSTLog.debug("Exiting LST.")
+        LSTLog.Logger.debug("Exiting LST.")
         root.quit()
 
     def switchuser():
-        LSTLog.debug("Switch User.")
+        LSTLog.Logger.debug("Switch User.")
 
     def logout():
-        LSTLog.debug("Logout.")
+        LSTLog.Logger.debug("Logout.")
 
     def restart():
-        LSTLog.debug("Restart.")
+        LSTLog.Logger.debug("Restart.")
 
     def shutdown():
-        LSTLog.debug("Shutdown.")
+        LSTLog.Logger.debug("Shutdown.")
 
     def openhelp():
-        LSTLog.debug("Open Help Window.")
+        LSTLog.Logger.debug("Open Help Window.")
         helpwindow = tk.Toplevel(root)
         helpwindow.title(GlobalVars.LSTFULLNAME)
         ico = Image.open(GlobalVars.MAINICO)
@@ -138,7 +128,7 @@ class GUIActions():
         helpauthorlbl.grid(column= 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
 
     def openabout():
-        LSTLog.debug("Open About Window.")
+        LSTLog.Logger.debug("Open About Window.")
         aboutwindow = tk.Toplevel(root)
         aboutwindow.title(GlobalVars.LSTFULLNAME)
         ico = Image.open(GlobalVars.MAINICO)
@@ -147,10 +137,9 @@ class GUIActions():
         aboutwinttlfrm = tk.LabelFrame(aboutwindow, text = "About")
         aboutwinttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
         img = Image.open(GlobalVars.MAINICO)
-        img.resize((128, 128))
-        image = ImageTk.PhotoImage(img)
+        image = ImageTk.PhotoImage(img.resize((127, 127)))
         aboutcanvas = Canvas(aboutwinttlfrm, width=128, height=128)
-        aboutcanvas.create_image(128, 128, image = image)
+        aboutcanvas.create_image(64, 64, image = image)
         aboutcanvas.grid(column=0, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
         aboutttllbl = tk.Label(aboutwinttlfrm, text=GlobalVars.LSTFULLNAME)
         aboutttllbl.grid(column=1, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky="SW")
@@ -176,91 +165,91 @@ class GUIActions():
         aboutver.grid(column = 1, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
 
     def getmacaddr(addr=None):
-        LSTLog.debug("getmacaddr function.")
+        LSTLog.Logger.debug("getmacaddr function.")
         try:
             addr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep ether | awk '{print$2}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(addr)
+            LSTLog.Logger.debug(addr)
         except Exception as e:
-            LSTLog.error("Unable to retrive MAC address from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.Logger.error("Unable to retrive MAC address from interface: ", GlobalVars.CURRENTINT, e)
         return addr
 
     def getmtu(mtu=None):
-        LSTLog.debug("getmtu function.")
+        LSTLog.Logger.debug("getmtu function.")
         try:
             mtu = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | head -n +1 | awk '{print$4}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(mtu)
+            LSTLog.Logger.debug(mtu)
         except Exception as e:
-            LSTLog.error("Unable to retrive MTU from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.Logger.error("Unable to retrive MTU from interface: ", GlobalVars.CURRENTINT, e)
         return mtu
 
     def getipaddr(ipaddr=None):
-        LSTLog.debug("getipaddr function.")
+        LSTLog.Logger.debug("getipaddr function.")
         try:
             ipaddr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$2}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(ipaddr)
+            LSTLog.Logger.debug(ipaddr)
         except Exception as e:
-            LSTLog.error("Unable to retrive IP address from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.Logger.error("Unable to retrive IP address from interface: ", GlobalVars.CURRENTINT, e)
         return ipaddr
 
     def getsubmask(submask=None):
-        LSTLog.debug("getsubmask function.")
+        LSTLog.Logger.debug("getsubmask function.")
         try:
             submask = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(submask)
+            LSTLog.Logger.debug(submask)
         except Exception as e:
-            LSTLog.error("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.Logger.error("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
         return submask
 
     def getdefgw(defgw=None):
-        LSTLog.debug("getdefgw function.")
+        LSTLog.Logger.debug("getdefgw function.")
         try:
             defgw = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$4}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(defgw)
+            LSTLog.Logger.debug(defgw)
         except Exception as e:
-            LSTLog.error("Unable to retrive default gateway from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.Logger.error("Unable to retrive default gateway from interface: ", GlobalVars.CURRENTINT, e)
         return defgw
 
     def getbcastaddr(bcastaddr=None):
-        LSTLog.debug("getbcastaddr function.")
+        LSTLog.Logger.debug("getbcastaddr function.")
         try:
             bcastaddr = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep inet | head -n +1 | awk '{print$6}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(bcastaddr)
+            LSTLog.Logger.debug(bcastaddr)
         except Exception as e:
-            LSTLog.error("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
+            LSTLog.Logger.error("Unable to retrive subnet mask from interface: ", GlobalVars.CURRENTINT, e)
         return bcastaddr
 
     def getdnsserveraddr(dnsserveraddr=None):
-        LSTLog.debug("getdnsserveraddr function.")
+        LSTLog.Logger.debug("getdnsserveraddr function.")
         try:
             dnsserveraddr = subprocess.Popen("cat /etc/resolv.conf | tail -n +3 | awk '{print$2}'| head -n +1 | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(dnsserveraddr)
+            LSTLog.Logger.debug(dnsserveraddr)
         except Exception as e:
-            LSTLog.error("Unable to retrive system DNS address(es).", e)
+            LSTLog.Logger.error("Unable to retrive system DNS address(es).", e)
         return dnsserveraddr
 
     def gethostname(hostname=None):
-        LSTLog.debug("gethostname function.")
+        LSTLog.Logger.debug("gethostname function.")
         try:
             hostname = subprocess.Popen("hostname | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(hostname)
+            LSTLog.Logger.debug(hostname)
         except Exception as e:
-            LSTLog.error("Unable to retrive system host name.", e)
+            LSTLog.Logger.error("Unable to retrive system host name.", e)
         return hostname
 
     def getdomainname(domainname=None):
-        LSTLog.debug("getdomainname function.")
+        LSTLog.Logger.debug("getdomainname function.")
         try:
             domainname = subprocess.Popen("cat /etc/resolv.conf | tail -n +2 | awk '{print$2}' | head -n +1 | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(domainname)
+            LSTLog.Logger.debug(domainname)
         except Exception as e:
-            LSTLog.error("Unable to retrive system domain name.", e)
+            LSTLog.Logger.error("Unable to retrive system domain name.", e)
         return domainname
 
     def killproc(proc=None):
-        LSTLog.debug("killproc function.")
+        LSTLog.Logger.debug("killproc function.")
 
     def spawnproc(proc=None):
-        LSTLog.debug("spawnproc function.")
+        LSTLog.Logger.debug("spawnproc function.")
         spawnprocwindow = tk.Toplevel(root)
         spawnprocwindow.title(GlobalVars.LSTFULLNAME)
         ico = Image.open(GlobalVars.MAINICO)
@@ -276,50 +265,50 @@ class GUIActions():
         spawnprocbrowsebtn.grid(column=2, row=0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICFULLFRMSTICKY)
         
     def enablesvc(svc=None):
-        LSTLog.debug("enablesvc function.")
+        LSTLog.Logger.debug("enablesvc function.")
     
     def disablesvc(svc=None):
-        LSTLog.debug("disablesvc function.")
+        LSTLog.Logger.debug("disablesvc function.")
     
     def startsvc(svc=None):
-        LSTLog.debug("startsvc function.")
+        LSTLog.Logger.debug("startsvc function.")
     
     def stopsvc(svc=None):
-        LSTLog.debug("stopsvc function.")
+        LSTLog.Logger.debug("stopsvc function.")
 
     def newuser(user=None):
-        LSTLog.debug("newuser function.")
+        LSTLog.Logger.debug("newuser function.")
     
     def disableuser(user=None):
-        LSTLog.debug("disableuser function.")
+        LSTLog.Logger.debug("disableuser function.")
     
     def deluser(user=None):
-        LSTLog.debug("deluser function.")
+        LSTLog.Logger.debug("deluser function.")
 
     def toggleinterface():
-        LSTLog.debug("Toggle Interface")
-        LSTLog.debug(GlobalVars.CURRENTINTSTAT)
+        LSTLog.Logger.debug("Toggle Interface")
+        LSTLog.Logger.debug(GlobalVars.CURRENTINTSTAT)
         if GlobalVars.CURRENTINTSTAT == "UP":
             try:
                 subprocess.Popen("sudo ifconfig ", GlobalVars.CURRENTINT, " down", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-                LSTLog.debug("")
+                LSTLog.Logger.debug("")
             except Exception as e:
-                LSTLog.error("Unable to disable interface: ", GlobalVars.CURRENTINT, e)
+                LSTLog.Logger.error("Unable to disable interface: ", GlobalVars.CURRENTINT, e)
         else:
             try:
                 subprocess.Popen("sudo ifconfig ", GlobalVars.CURRENTINT, " up", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
             except Exception as e:
-                LSTLog.error("Unable to enable interface: ", GlobalVars.CURRENTINT, e)
+                LSTLog.Logger.error("Unable to enable interface: ", GlobalVars.CURRENTINT, e)
 
     def dhcprelease():
-        LSTLog.info("DHCP Release")
+        LSTLog.Logger.info("DHCP Release")
 
     def dhcprenew():
-        LSTLog.info("DHCP Renew")
+        LSTLog.Logger.info("DHCP Renew")
 
     def refreshintstats(int=None):
-        LSTLog.info("refreshintstats function.")
-        LSTLog.debug(GlobalVars.CURRENTINT)
+        LSTLog.Logger.info("refreshintstats function.")
+        LSTLog.Logger.debug(GlobalVars.CURRENTINT)
         intstats = []
         try:
             intstats[1] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'RX packets' | awk {'print$3'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
@@ -337,35 +326,35 @@ class GUIActions():
             intstats[13] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$7'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             intstats[14] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
             intstats[15] = subprocess.Popen("ifconfig " + GlobalVars.CURRENTINT + " | grep 'TX errors' | awk {'print$11'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-            LSTLog.debug(intstats)
+            LSTLog.Logger.debug(intstats)
         except Exception as e:
-            LSTLog.error("Unable to refresh stats for int", e)
+            LSTLog.Logger.error("Unable to refresh stats for int", e)
         return intstats
 
     def selectinterface():
-        LSTLog.info("Select Interface Function.")
+        LSTLog.Logger.info("Select Interface Function.")
         GlobalVars.CURRENTINT = BuildGUI.intcombo.get()
-        LSTLog.debug(GlobalVars.CURRENTINT)
+        LSTLog.Logger.debug(GlobalVars.CURRENTINT)
         try:
             intstatus = subprocess.Popen("ip a sh dev " + GlobalVars.CURRENTINT + " | head -n 1 | awk {'print$9'}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         except Exception as e: 
-            LSTLog.error("Unable to retrieve current interface status. ", e)
+            LSTLog.Logger.error("Unable to retrieve current interface status. ", e)
         if search("UP", intstatus):
-            LSTLog.info("Interface UP")
+            LSTLog.Logger.info("Interface UP")
             BuildGUI.disableintbtn.config(text="Disable", state="normal")
             BuildGUI.intstatus['text'] = "Up"
         else:
             if search("DOWN", intstatus):
-                LSTLog.info("Interface DOWN")
+                LSTLog.Logger.info("Interface DOWN")
                 BuildGUI.disableintbtn.config(text="Enable", state="normal")
                 BuildGUI.intstatus['text'] = "Down"
             else:
                 if GlobalVars.CURRENTINT == "lo":
-                    LSTLog.info("Interface Loopback")
+                    LSTLog.Logger.info("Interface Loopback")
                     BuildGUI.disableintbtn.config(text="Disable", state="disabled")
                     BuildGUI.intstatus['text'] = "Loopback"
                 else:
-                    LSTLog.info("Interface Unknown")
+                    LSTLog.Logger.info("Interface Unknown")
                     BuildGUI.disableintbtn.config(text="Disable", state="normal")
                     BuildGUI.intstatus['text'] = "Unknown"
         BuildGUI.macaddr['text'] = GUIActions.getmacaddr()
@@ -398,11 +387,11 @@ class GUIActions():
         BuildGUI.refreshbtn.config(state="normal")
     
     def getroutetable():
-        LSTLog.debug("Get route table.")
+        LSTLog.Logger.debug("Get route table.")
         try:
             introutetable = subprocess.Popen("netstat -r | tail -n +3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         except Exception as e:
-            LSTLog.error("Unable to retrieve route table.", e)
+            LSTLog.Logger.error("Unable to retrieve route table.", e)
         introutetable = introutetable.split()
         count = 0
         rowcount = 1
@@ -417,10 +406,10 @@ class GUIActions():
                 count = count + 1
     
     def selwrlssint():
-        LSTLog.debug("selwrlssint function.")
+        LSTLog.Logger.debug("selwrlssint function.")
 
     def getmemoryinfo():
-        LSTLog.debug("getmemoryinfo function")
+        LSTLog.Logger.debug("getmemoryinfo function")
         BuildGUI.perftabmemtotal['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$2'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.perftabmemavail['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$7'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.perftabstatmemuse['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$3'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
@@ -436,7 +425,7 @@ class GUIActions():
         
 
     def getprocinfo():
-        LSTLog.debug("getprocinfo function")
+        LSTLog.Logger.debug("getprocinfo function")
         BuildGUI.perftabstatsproc['text'] = subprocess.Popen("ps -aux | wc -l  | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.perftabprocs['text'] = subprocess.Popen("ps -aux | wc -l  | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         GlobalVars.cpuidle = subprocess.Popen("iostat -c | tail -n 4 | awk {'print$6'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
@@ -448,10 +437,10 @@ class GUIActions():
         GUIActions.drawcpugraph(cpu)
 
     def drawcpugraph(cpu):
-        LSTLog.debug("drawcpugraph function")
-        LSTLog.debug(cpu)
+        LSTLog.Logger.debug("drawcpugraph function")
+        LSTLog.Logger.debug(cpu)
         if int(cpu) <= 10:
-            LSTLog.debug("Cpu 10% or less") 
+            LSTLog.Logger.debug("Cpu 10% or less") 
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -463,7 +452,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#1a6600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 20 and int(cpu) > 10:
-            LSTLog.debug("Cpu 20%")
+            LSTLog.Logger.debug("Cpu 20%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -475,7 +464,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 30 and int(cpu) > 20:
-            LSTLog.debug("Cpu 30%")
+            LSTLog.Logger.debug("Cpu 30%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -487,7 +476,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 40 and int(cpu) > 30:
-            LSTLog.debug("Cpu 40%")
+            LSTLog.Logger.debug("Cpu 40%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -499,7 +488,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 50 and int(cpu) > 40:
-            LSTLog.debug("Cpu 50%")
+            LSTLog.Logger.debug("Cpu 50%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -511,7 +500,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 60 and int(cpu) > 50:
-            LSTLog.debug("Cpu 60%")
+            LSTLog.Logger.debug("Cpu 60%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -523,7 +512,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 70 and int(cpu) > 60:
-            LSTLog.debug("Cpu 70%")
+            LSTLog.Logger.debug("Cpu 70%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
@@ -535,7 +524,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 80 and int(cpu) > 70:
-            LSTLog.debug("Cpu 80%")
+            LSTLog.Logger.debug("Cpu 80%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#666600', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#ffff00', font=('Cantarell Regular', 12, 'bold'))
@@ -547,7 +536,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 90 and int(cpu) > 80:
-            LSTLog.debug("Cpu 90%")
+            LSTLog.Logger.debug("Cpu 90%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#800000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#ffff00', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#ffff00', font=('Cantarell Regular', 12, 'bold'))
@@ -559,7 +548,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
         elif int(cpu) <= 100 and int(cpu) > 90:
-            LSTLog.debug("Cpu 100%")
+            LSTLog.Logger.debug("Cpu 100%")
             BuildGUI.cpucanvas.create_text(64, 30, text="_______", fill='#ff0000', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 35, text="_______", fill='#ffff00', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 40, text="_______", fill='#ffff00', font=('Cantarell Regular', 12, 'bold'))
@@ -573,7 +562,7 @@ class GUIActions():
             
 class NetToolbox():
     def Open():
-        LSTLog.debug("Open Network Toolbox Window.")
+        LSTLog.Logger.debug("Open Network Toolbox Window.")
         toolboxwindow = tk.Toplevel(root)
         toolboxwindow.title(GlobalVars.LSTFULLNAME)
         toolboxwindow.geometry("700x500")
