@@ -30,6 +30,7 @@ Red: #ff0000
 Red Shade: #800000
 """
 import tkinter as tk
+import os
 import tksheet
 import logging
 import subprocess
@@ -39,21 +40,22 @@ from re import search
 from PIL import Image, ImageTk
 
 root = tk.Tk()
+print(f"Current working dir: {os.getcwd()}")
 
 class GlobalVars(object):
-    LSTVER = "0.1a24"                                                                       #Sytem Version number
-    LSTNAME = "Linux System Toolbox"                                                        #Application Name
+    LSTVER = "0.1a24"
+    LSTNAME = "Linux System Toolbox"
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
-    LSTAUTHOR = "Lothar TheQuiet"                                                           #Application Author
-    LSTCONTACT = "lotharthequiet@gmail.com"                                                 #Application Author Contact
-    LSTGITHUBREPO = "https://github.com/lotharthequiet/LinuxSystemToolbox"                  #GitHub Repository
-    LSTGITHUB = "https://github.com/lotharthequiet/LinuxSystemToolbox.git"                  #GitHub Direct Link
-    DEFPADX = 10                                                                            #Static X Padding Value
-    DEFPADY = 5                                                                             #Static Y Padding Value
-    NARROWPAD = 5                                                                           #Static Narrow Pad Value
-    BTNSIZE = 12                                                                            #Static button size value
-    STATICSTICKY = "W"                                                                        #Static sticky direction
-    STATICFULLFRMSTICKY = "NSEW"                                                              #Static full sticky for label frames
+    LSTAUTHOR = "Lothar TheQuiet"
+    LSTCONTACT = "lotharthequiet@gmail.com"
+    LSTGITHUBREPO = "https://github.com/lotharthequiet/LinuxSystemToolbox"
+    LSTGITHUB = "https://github.com/lotharthequiet/LinuxSystemToolbox.git"
+    DEFPADX = 10
+    DEFPADY = 5
+    NARROWPAD = 5
+    BTNSIZE = 12
+    STATICSTICKY = "W"
+    STATICFULLFRMSTICKY = "NSEW"
     CURRENTINT = None
     CURRENTWRLSSINT = None
     CURRENTINTSTAT = None
@@ -64,6 +66,8 @@ class GlobalVars(object):
     memused = 0
     totalmem = 0
     cpuidle = 0
+    INTLIST = None
+    WRLSSINTLIST = None
 
 class LSTLog():
     Logger = logging.getLogger(__name__)
@@ -74,17 +78,21 @@ class LSTLog():
     Logh.setFormatter(Loggerfmt)
     Logger.addHandler(Logh)
 
-try:
-    INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-except Exception as e:
-    LSTLog.Logger.error("Unable to retrieve interface list.", e)
-INTLIST = INTLIST.split()
-try: 
-    WRLSSINTLIST = subprocess.Popen("iw dev | awk '$1==\"Interface\"{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-except Exception as e:
-    LSTLog.Logger.error("Unable to retrieve wireless interface list.", e)
-WRLSSINTLIST = WRLSSINTLIST.split()
+class StartUpActions():
+    def GetIntList():
+        try:
+            GlobalVars.INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        except Exception as e:
+            LSTLog.Logger.error("Unable to retrieve interface list.", e)
+        print(GlobalVars.INTLIST)
+        GlobalVars.INTLIST = GlobalVars.INTLIST.split()
 
+    def GetWIntList():
+        try: 
+            GlobalVars.WRLSSINTLIST = subprocess.Popen("iw dev | awk '$1==\"Interface\"{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+        except Exception as e:
+            LSTLog.Logger.error("Unable to retrieve wireless interface list.", e)
+        GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
 
 class GUIActions():
     def runreports():
@@ -163,6 +171,7 @@ class GUIActions():
         aboutverlbl.grid(column = 0, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
         aboutver = tk.Label(aboutwinttlfrm, text = GlobalVars.LSTVER)
         aboutver.grid(column = 1, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
+        print(GlobalVars.test)
 
     def getmacaddr(addr=None):
         LSTLog.Logger.debug("getmacaddr function.")
@@ -407,6 +416,8 @@ class GUIActions():
     
     def selwrlssint():
         LSTLog.Logger.debug("selwrlssint function.")
+        GlobalVars.CURRENTWRLSSINT = BuildGUI.wrlssintcombo.get()
+        LSTLog.Logger.debug(GlobalVars.CURRENTWRLSSINT)
 
     def getmemoryinfo():
         LSTLog.Logger.debug("getmemoryinfo function")
@@ -423,7 +434,6 @@ class GUIActions():
         BuildGUI.perftabswapused['text'] = subprocess.Popen("free | tail -n 2 | head -n 1 | awk {'print$3'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         BuildGUI.perftabswapfree['text'] = subprocess.Popen("free | tail -n 1 | awk {'print$4'} | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
         
-
     def getprocinfo():
         LSTLog.Logger.debug("getprocinfo function")
         BuildGUI.perftabstatsproc['text'] = subprocess.Popen("ps -aux | wc -l  | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
@@ -605,7 +615,7 @@ class NetToolbox():
         disableintbtn.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
         intlbl = tk.Label(configtabcontfrm, text ="Select Interface:")
         intlbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
-        intcombo = ttk.Combobox(configtabcontfrm, values = INTLIST)
+        intcombo = ttk.Combobox(configtabcontfrm, values = GlobalVars.INTLIST)
         intcombo.grid(column = 1, row = 0, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
         intcombo.set("Select Interface:")
         intcombo.bind('<<ComboboxSelected>>', lambda event: GUIActions.selectinterface())
@@ -822,7 +832,7 @@ class BuildGUI():
     selintname = tk.StringVar()
     intlbl = tk.Label(nettab, text ="Interface Name:")
     intlbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
-    intcombo = ttk.Combobox(nettab, values = INTLIST)
+    intcombo = ttk.Combobox(nettab, values = GlobalVars.INTLIST)
     intcombo.grid(column = 1, row = 0, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
     intcombo.set("Select Interface")
     intcombo.bind('<<ComboboxSelected>>', lambda event: GUIActions.selectinterface())
@@ -1044,7 +1054,7 @@ class BuildGUI():
     perftabstatmemusetotal.grid(column=7, row=0, padx=GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICSTICKY)
     wrlssintlbl = tk.Label(wrlsstab, text ="WLAN Interface Name:")
     wrlssintlbl.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky='NW')
-    wrlssintcombo = ttk.Combobox(wrlsstab, values = WRLSSINTLIST)
+    wrlssintcombo = ttk.Combobox(wrlsstab, values = GlobalVars.WRLSSINTLIST)
     wrlssintcombo.grid(column = 1, row = 0, pady = (10, 5), sticky='NW')
     wrlssintcombo.set("Select Interface:")
     wrlssintcombo.bind('<<ComboboxSelected>>', lambda event: GUIActions.selwrlssint())
@@ -1113,6 +1123,8 @@ class BuildGUI():
     wrlsssignal = tk.Label(wrlsstabttlfrm)
     wrlsssignal.grid(column = 3, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
 
+StartUpActions.GetIntList()
+StartUpActions.GetWIntList()
 GUIActions.getmemoryinfo()
 GUIActions.getprocinfo()
 app=BuildGUI()
