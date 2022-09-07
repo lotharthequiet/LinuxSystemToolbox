@@ -78,21 +78,18 @@ class LSTLog():
     Logh.setFormatter(Loggerfmt)
     Logger.addHandler(Logh)
 
-class StartUpActions():
-    def GetIntList():
-        try:
-            GlobalVars.INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        except Exception as e:
-            LSTLog.Logger.error("Unable to retrieve interface list.", e)
-        print(GlobalVars.INTLIST)
-        GlobalVars.INTLIST = GlobalVars.INTLIST.split()
-
-    def GetWIntList():
-        try: 
-            GlobalVars.WRLSSINTLIST = subprocess.Popen("iw dev | awk '$1==\"Interface\"{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-        except Exception as e:
-            LSTLog.Logger.error("Unable to retrieve wireless interface list.", e)
-        GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
+try:
+    GlobalVars.INTLIST = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve interface list.", e)
+print(GlobalVars.INTLIST)
+GlobalVars.INTLIST = GlobalVars.INTLIST.split()
+try: 
+    GlobalVars.WRLSSINTLIST = subprocess.Popen("iw dev | awk '$1==\"Interface\"{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve wireless interface list.", e)
+GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
+        
 
 class GUIActions():
     def runreports():
@@ -1123,8 +1120,6 @@ class BuildGUI():
     wrlsssignal = tk.Label(wrlsstabttlfrm)
     wrlsssignal.grid(column = 3, row = 5, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky=GlobalVars.STATICSTICKY)
 
-StartUpActions.GetIntList()
-StartUpActions.GetWIntList()
 GUIActions.getmemoryinfo()
 GUIActions.getprocinfo()
 app=BuildGUI()
