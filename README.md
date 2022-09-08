@@ -9,12 +9,11 @@ This app is in NO way built the best way possible!!!
 
 
 To Do List: (Not ordered in priority) 
-1. Correct the IF statement logic errors on line 84. This might be accomplished by changing the logic used. Check if each text string is null, and the result will be the values needed. 
-2. Work on Processes tab
-3. Work on Services tab
-4. Work on Users tab
-5. Finish Networking tab
-6. Work on Performance tab
-7. Work on Wireless tab
-8. Work on menu action items
-9. Test on Ubuntu and Fedora
+- Work on Processes tab
+- Work on Services tab
+- Work on Users tab
+- Finish Networking tab
+- Work on Performance tab
+- Work on Wireless tab
+- Work on menu action items
+- Test on Ubuntu and Fedora
