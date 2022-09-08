@@ -29,6 +29,7 @@ Yellow Shade: #666600
 Red: #ff0000
 Red Shade: #800000
 """
+from ast import Global
 import tkinter as tk
 import os
 import tksheet
@@ -68,6 +69,9 @@ class GlobalVars(object):
     cpuidle = 0
     INTLIST = None
     WRLSSINTLIST = None
+    proclist = None
+    loggedusers = None
+    allusers = None
 
 class LSTLog():
     Logger = logging.getLogger(__name__)
@@ -84,12 +88,30 @@ except Exception as e:
     LSTLog.Logger.error("Unable to retrieve interface list.", e)
 print(GlobalVars.INTLIST)
 GlobalVars.INTLIST = GlobalVars.INTLIST.split()
+
 try: 
     GlobalVars.WRLSSINTLIST = subprocess.Popen("iw dev | awk '$1==\"Interface\"{print$2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
 except Exception as e:
     LSTLog.Logger.error("Unable to retrieve wireless interface list.", e)
 GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
-        
+
+try:
+    GlobalVars.proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    GlobalVars.proclist = GlobalVars.proclist.split(" ")
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve system process list.", e)
+
+try:
+    GlobalVars.loggedusers = subprocess.Popen("who | awk '{print$1}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    GlobalVars.loggedusers = GlobalVars.loggedusers.split(" ")
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve logged in users.")
+
+try: 
+    GlobalVars.allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    GlobalVars.allusers = GlobalVars.allusers.split(" ")
+except Exception as e:
+    LSTLog.Logger.error("Unable to retrieve list of system users.")
 
 class GUIActions():
     def runreports():
@@ -756,7 +778,7 @@ class BuildGUI():
     nettab = tk.Frame(LSTnb)
     perftab = tk.Frame(LSTnb)
     wrlsstab = tk.Frame(LSTnb)
-    LSTnb.add(proctab, text ='Processes')
+    LSTnb.add(proctab, text ='Applications')
     LSTnb.add(servicestab, text ='Services')
     LSTnb.add(userstab, text ='Users')
     LSTnb.add(nettab, text ='Networking')
@@ -764,11 +786,17 @@ class BuildGUI():
     LSTnb.add(wrlsstab, text = 'Wireless')
     LSTnb.pack(expand = 1, fill ="both")
     root.config(menu=menubar)
-    proctabttlfrm = tk.LabelFrame(proctab, text="Running Processes")
+    proctabttlfrm = tk.LabelFrame(proctab, text="Running Applications")
     proctabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
     procsht = tksheet.Sheet(proctabttlfrm)
     procsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     procsht.enable_bindings(("row_select"))
+    print(GlobalVars.proclist)
+    procsht.set_sheet_data(data=GlobalVars.proclist)
+    procsht.headers(["User","PID","CPU %","Mem %","TTY","Command"])
+    #for each in GlobalVars.proclist:
+    #    procsht.insert_row(values=GlobalVars.proclist)
+    #procsht.insert_row("test")
     proctabbtnfrm = tk.Frame(proctab)
     proctabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     killprocbtn = tk.Button(proctabbtnfrm, text="Kill Process", width = GlobalVars.BTNSIZE, state="disabled")
@@ -796,10 +824,16 @@ class BuildGUI():
     lclusrtabttlfrm.grid(column = 0, row = 1, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
     currentusrsht = tksheet.Sheet(usrtabttlfrm)
     currentusrsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
+    print(GlobalVars.loggedusers)
     currentusrsht.enable_bindings(("row_select"))
+    currentusrsht.headers(["User"])
+    currentusrsht.set_sheet_data(data=GlobalVars.loggedusers)
     lclusrsht = tksheet.Sheet(lclusrtabttlfrm)
     lclusrsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
+    print(GlobalVars.allusers)
     lclusrsht.enable_bindings(("row_select"))
+    lclusrsht.headers(["User"])
+    lclusrsht.set_sheet_data(data=GlobalVars.allusers)
     usrtabbtnfrm = tk.Frame(userstab)
     usrtabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY, sticky='N')
     newuserbtn = tk.Button(usrtabbtnfrm, text="New User", width = GlobalVars.BTNSIZE, command=GUIActions.newuser)
