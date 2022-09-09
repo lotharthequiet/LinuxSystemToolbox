@@ -1,3 +1,4 @@
+#!/bin/python3
 """
 *********************************************************************************
 |                                                                               |
@@ -29,7 +30,6 @@ Yellow Shade: #666600
 Red: #ff0000
 Red Shade: #800000
 """
-from ast import Global
 import tkinter as tk
 import os
 import tksheet
