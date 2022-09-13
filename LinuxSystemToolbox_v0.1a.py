@@ -44,7 +44,7 @@ root = tk.Tk()
 print(f"Current working dir: {os.getcwd()}")
 
 class GlobalVars(object):
-    LSTVER = "0.1a24"
+    LSTVER = "0.1a30"
     LSTNAME = "Linux System Toolbox"
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"
@@ -96,20 +96,26 @@ except Exception as e:
 GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
 
 try:
-    GlobalVars.proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-    GlobalVars.proclist = GlobalVars.proclist.split(" ")
+    proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    proclist = proclist.split("\n")
+    GlobalVars.proclist = [[x for x in line.strip().split(' ')] for line in proclist]
+    LSTLog.Logger.debug(GlobalVars.proclist)
 except Exception as e:
     LSTLog.Logger.error("Unable to retrieve system process list.", e)
 
 try:
-    GlobalVars.loggedusers = subprocess.Popen("who | awk '{print$1}' | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-    GlobalVars.loggedusers = GlobalVars.loggedusers.split(" ")
+    loggedusers = subprocess.Popen("who | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    loggedusers = loggedusers.split("\n")
+    GlobalVars.loggedusers = [[x for x in line.strip().split(' ')] for line in loggedusers]
+    LSTLog.Logger.debug(GlobalVars.loggedusers)
 except Exception as e:
-    LSTLog.Logger.error("Unable to retrieve logged in users.")
+    LSTLog.Logger.error("Unable to retrieve logged in users.", e)
 
 try: 
-    GlobalVars.allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd | tr -d '\n'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
-    GlobalVars.allusers = GlobalVars.allusers.split(" ")
+    allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    allusers = allusers.split("\n")
+    GlobalVars.allusers = [[x for x in line.strip().split(' ')] for line in allusers]
+    LSTLog.Logger.debug(GlobalVars.allusers)
 except Exception as e:
     LSTLog.Logger.error("Unable to retrieve list of system users.")
 
