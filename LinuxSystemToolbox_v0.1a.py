@@ -96,7 +96,7 @@ except Exception as e:
 GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
 
 try:
-    proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d' | head -c -1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
     proclist = proclist.split("\n")
     GlobalVars.proclist = [[x for x in line.strip().split(' ')] for line in proclist]
     LSTLog.Logger.debug(GlobalVars.proclist)
@@ -104,7 +104,7 @@ except Exception as e:
     LSTLog.Logger.error("Unable to retrieve system process list.", e)
 
 try:
-    loggedusers = subprocess.Popen("who | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    loggedusers = subprocess.Popen("who | awk '{print$1}' | head -c -1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
     loggedusers = loggedusers.split("\n")
     GlobalVars.loggedusers = [[x for x in line.strip().split(' ')] for line in loggedusers]
     LSTLog.Logger.debug(GlobalVars.loggedusers)
@@ -112,7 +112,7 @@ except Exception as e:
     LSTLog.Logger.error("Unable to retrieve logged in users.", e)
 
 try: 
-    allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd | head -c -1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
     allusers = allusers.split("\n")
     GlobalVars.allusers = [[x for x in line.strip().split(' ')] for line in allusers]
     LSTLog.Logger.debug(GlobalVars.allusers)
@@ -794,7 +794,7 @@ class BuildGUI():
     root.config(menu=menubar)
     proctabttlfrm = tk.LabelFrame(proctab, text="Running Applications")
     proctabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.DEFPADX, pady = (10, 5), sticky=GlobalVars.STATICFULLFRMSTICKY, columnspan=2)
-    procsht = tksheet.Sheet(proctabttlfrm)
+    procsht = tksheet.Sheet(proctabttlfrm, enable_edit_cell_auto_resize = False, show_row_index = True)
     procsht.grid(padx = GlobalVars.DEFPADX, pady = GlobalVars.DEFPADY)
     procsht.enable_bindings(("row_select"))
     print(GlobalVars.proclist)
