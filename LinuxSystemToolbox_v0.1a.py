@@ -44,7 +44,7 @@ root = tk.Tk()
 print(f"Current working dir: {os.getcwd()}")
 
 class GlobalVars(object):
-    LSTVER = "0.1a30"
+    LSTVER = "0.1a35"
     LSTNAME = "Linux System Toolbox"
     LSTFULLNAME = (LSTNAME + " " + LSTVER)
     LSTAUTHOR = "Lothar TheQuiet"
@@ -96,7 +96,8 @@ except Exception as e:
 GlobalVars.WRLSSINTLIST = GlobalVars.WRLSSINTLIST.split()
 
 try:
-    proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d' | head -c -1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    proclist = subprocess.Popen("ps -au | awk '{print$1,$2,$3,$4,$7,$11}' | sed '1d'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    proclist = proclist[:-1]
     proclist = proclist.split("\n")
     GlobalVars.proclist = [[x for x in line.strip().split(' ')] for line in proclist]
     LSTLog.Logger.debug(GlobalVars.proclist)
@@ -104,7 +105,8 @@ except Exception as e:
     LSTLog.Logger.error("Unable to retrieve system process list.", e)
 
 try:
-    loggedusers = subprocess.Popen("who | awk '{print$1}' | head -c -1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    loggedusers = subprocess.Popen("who | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    loggedusers = loggedusers[:-1]
     loggedusers = loggedusers.split("\n")
     GlobalVars.loggedusers = [[x for x in line.strip().split(' ')] for line in loggedusers]
     LSTLog.Logger.debug(GlobalVars.loggedusers)
@@ -112,7 +114,8 @@ except Exception as e:
     LSTLog.Logger.error("Unable to retrieve logged in users.", e)
 
 try: 
-    allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd | head -c -1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    allusers = subprocess.Popen("awk -F: '{print$1}' /etc/passwd", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    allusers = allusers[:-1]
     allusers = allusers.split("\n")
     GlobalVars.allusers = [[x for x in line.strip().split(' ')] for line in allusers]
     LSTLog.Logger.debug(GlobalVars.allusers)
