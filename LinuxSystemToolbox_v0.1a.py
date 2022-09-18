@@ -87,7 +87,6 @@ try:
     GlobalVars.intlist = subprocess.Popen("ifconfig -s -a | tail -n +2 | awk '{print$1}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
 except Exception as e:
     LSTLog.Logger.error("Unable to retrieve interface list.", e)
-print(GlobalVars.intlist)
 GlobalVars.intlist = GlobalVars.intlist.split()
 
 try: 
