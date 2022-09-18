@@ -44,7 +44,7 @@ root = tk.Tk()
 print(f"Current working dir: {os.getcwd()}")
 
 class GlobalVars(object):
-    lstver = "0.1a40"
+    lstver = "0.1a50"
     lstname = "Linux System Toolbox"
     lstfull = (lstname + " " + lstver)
     author = "Lothar TheQuiet"
@@ -72,6 +72,7 @@ class GlobalVars(object):
     proclist = None
     loggedusers = None
     allusers = None
+    services = None
 
 class LSTLog():
     Logger = logging.getLogger(__name__)
@@ -100,7 +101,6 @@ try:
     proclist = proclist[:-1]
     proclist = proclist.split("\n")
     GlobalVars.proclist = [[x for x in line.strip().split(' ')] for line in proclist]
-    LSTLog.Logger.debug(GlobalVars.proclist)
 except Exception as e:
     LSTLog.Logger.error("Unable to retrieve system process list.", e)
 
@@ -109,7 +109,6 @@ try:
     loggedusers = loggedusers[:-1]
     loggedusers = loggedusers.split("\n")
     GlobalVars.loggedusers = [[x for x in line.strip().split(' ')] for line in loggedusers]
-    LSTLog.Logger.debug(GlobalVars.loggedusers)
 except Exception as e:
     LSTLog.Logger.error("Unable to retrieve logged in users.", e)
 
@@ -118,9 +117,17 @@ try:
     allusers = allusers[:-1]
     allusers = allusers.split("\n")
     GlobalVars.allusers = [[x for x in line.strip().split(' ')] for line in allusers]
-    LSTLog.Logger.debug(GlobalVars.allusers)
 except Exception as e:
-    LSTLog.Logger.error("Unable to retrieve list of system users.")
+    LSTLog.Logger.error("Unable to retrieve list of system users.", e)
+try: 
+    services = subprocess.Popen("service --status-all", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0].decode('utf-8')
+    services = services[:-1]
+    services = services.replace("[ - ] ", "Stopped")
+    services = services.replace("[ + ] ", "Running")
+    services = services.split("\n")
+    GlobalVars.services = [[x for x in line.strip().split(' ')] for line in services]
+except Exception as e:
+    print("Unable to retrieve system services.", e)
 
 class GUIActions():
     def runreports():
@@ -745,8 +752,7 @@ class BuildGUI():
     proctabttlfrm.grid(column = 0, row = 0, padx = GlobalVars.defpadx, pady = (10, 5), sticky=GlobalVars.fullsticky, columnspan=2)
     procsht = tksheet.Sheet(proctabttlfrm, enable_edit_cell_auto_resize = False, show_row_index = True)
     procsht.grid(padx = GlobalVars.defpadx, pady = GlobalVars.defpady)
-    procsht.enable_bindings(("row_select"))
-    print(GlobalVars.proclist)
+    procsht.enable_bindings(("right_click_popup_menu", "row_select"))
     procsht.set_sheet_data(data=GlobalVars.proclist)
     procsht.headers(["User","PID","CPU %","Mem %","TTY","Command"])
     #for each in GlobalVars.proclist:
@@ -763,6 +769,8 @@ class BuildGUI():
     svcssht = tksheet.Sheet(svcstabttlfrm)
     svcssht.grid(padx = GlobalVars.defpadx, pady = GlobalVars.defpady)
     svcssht.enable_bindings(("row_select"))
+    svcssht.set_sheet_data(data=GlobalVars.services)
+    svcssht.headers(["Status","Name"])
     svcstabbtnfrm = tk.Frame(servicestab)
     svcstabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
     enablesvcbtn = tk.Button(svcstabbtnfrm, text="Enable Service", width = GlobalVars.btnsize, command=GUIActions.enablesvc, state="disabled")
