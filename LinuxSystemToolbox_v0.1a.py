@@ -146,17 +146,13 @@ class GUIActions():
         LSTLog.Logger.debug("Exiting LST.")
         root.quit()
 
-    def switchuser():
-        LSTLog.Logger.debug("Switch User.")
-
-    def logout():
-        LSTLog.Logger.debug("Logout.")
-
     def restart():
         LSTLog.Logger.debug("Restart.")
-
+        subprocess.Popen("shutdown -r", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+        
     def shutdown():
         LSTLog.Logger.debug("Shutdown.")
+        subprocess.Popen("shutdown -P", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
 
     def openhelp():
         LSTLog.Logger.debug("Open Help Window.")
@@ -604,7 +600,7 @@ class GUIActions():
             BuildGUI.cpucanvas.create_text(64, 65, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 70, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
             BuildGUI.cpucanvas.create_text(64, 75, text="_______", fill='#66ff33', font=('Cantarell Regular', 12, 'bold'))
-            
+
 class NetToolbox():
     def Open():
         LSTLog.Logger.debug("Open Network Toolbox Window.")
@@ -724,8 +720,6 @@ class BuildGUI():
     toolsmenu = tk.Menu(menubar, tearoff=0)                                    
     toolsmenu.add_command(label="Open Net Toolbox", command=NetToolbox.Open)
     toolsmenu.add_separator()
-    toolsmenu.add_command(label="Switch User", command=GUIActions.switchuser)
-    toolsmenu.add_command(label="Logout", command=GUIActions.logout)
     toolsmenu.add_command(label="Restart", command=GUIActions.restart)
     toolsmenu.add_command(label="Shutdown", command=GUIActions.shutdown)
     menubar.add_cascade(label="Tools", menu=toolsmenu)
