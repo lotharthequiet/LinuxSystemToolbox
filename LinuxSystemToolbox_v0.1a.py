@@ -44,7 +44,7 @@ root = tk.Tk()
 print(f"Current working dir: {os.getcwd()}")
 
 class GlobalVars(object):
-    lstver = "0.1a52"
+    lstver = "0.1a52 (Pre-Build Candidate)"
     lstname = "Linux System Toolbox"
     lstfull = (lstname + " " + lstver)
     author = "Lothar TheQuiet"
