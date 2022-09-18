@@ -44,7 +44,7 @@ root = tk.Tk()
 print(f"Current working dir: {os.getcwd()}")
 
 class GlobalVars(object):
-    lstver = "0.1a50"
+    lstver = "0.1a52"
     lstname = "Linux System Toolbox"
     lstfull = (lstname + " " + lstver)
     author = "Lothar TheQuiet"
@@ -284,8 +284,9 @@ class GUIActions():
             LSTLog.Logger.error("Unable to retrive system domain name.", e)
         return domainname
 
-    def killproc(proc=None):
+    def killproc(proc):
         LSTLog.Logger.debug("killproc function.")
+        subprocess.Popen("kill -9 " + proc, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
 
     def spawnproc(proc=None):
         LSTLog.Logger.debug("spawnproc function.")
@@ -315,14 +316,17 @@ class GUIActions():
     def stopsvc(svc=None):
         LSTLog.Logger.debug("stopsvc function.")
 
-    def newuser(user=None):
-        LSTLog.Logger.debug("newuser function.")
+    def logoutuser(user):
+        LSTLog.logger.debug("Logout user.", user)
+
+    def newuser(user):
+        LSTLog.Logger.debug("newuser function.", user)
     
-    def disableuser(user=None):
-        LSTLog.Logger.debug("disableuser function.")
+    def disableuser(user):
+        LSTLog.Logger.debug("disableuser function.", user)
     
-    def deluser(user=None):
-        LSTLog.Logger.debug("deluser function.")
+    def deluser(user):
+        LSTLog.Logger.debug("deluser function.", user)
 
     def toggleinterface():
         LSTLog.Logger.debug("Toggle Interface")
@@ -635,6 +639,46 @@ class NetToolbox():
         Toolboxnb.add(sftptab, text = 'SFTP')
         Toolboxnb.add(scptab, text = 'SCP')
         Toolboxnb.pack(expand = 1, fill ="both")
+        dhcptablblfrm = tk.LabelFrame(dhcptab, text="DHCP Server Options")
+        dhcptablblfrm.grid(column = 0, row = 0, padx = GlobalVars.defpadx, pady = (10, 5), sticky=GlobalVars.staticsticky)
+        dhcpbtnframe = tk.Frame(dhcptab)
+        dhcpbtnframe.grid(column = 1, row = 0, padx = GlobalVars.defpadx, pady = (10, 5), sticky='N')
+        startbtn = tk.Button(dhcpbtnframe, text="Start", width = GlobalVars.btnsize, command=GUIActions.deluser)
+        startbtn.grid(column=1, row=0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+        stopbtn = tk.Button(dhcpbtnframe, text="Stop", width = GlobalVars.btnsize, command=GUIActions.deluser, state='disabled')
+        stopbtn.grid(column=1, row=1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+        runninglbl = tk.Label(dhcptablblfrm, text="DHCP Server Status: ")
+        runninglbl.grid(column=0, row=0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        statuslbl = tk.Label(dhcptablblfrm, text="Stopped")
+        statuslbl.grid(column=1, row=0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        networklbl = tk.Label(dhcptablblfrm, text="Network:")
+        networklbl.grid(column=0, row=1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        networkentry = tk.Entry(dhcptablblfrm, text="192.168.1.0")
+        networkentry.grid(column=1, row=1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        masklbl = tk.Label(dhcptablblfrm, text="Subnet Mask:")
+        masklbl.grid(column=0, row=2, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        gatelbl = tk.Label(dhcptablblfrm, text="Def. Gateway:")
+        gatelbl.grid(column=0, row=3, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        dnslbl = tk.Label(dhcptablblfrm, text="DNS:")
+        dnslbl.grid(column=0, row=4, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        optionsfrm = tk.LabelFrame(dhcptab, text="DHCP Option Codes:")
+        optionsfrm.grid(column = 0, row = 1, padx = GlobalVars.defpadx, pady = (10, 5), sticky=GlobalVars.staticsticky, columnspan=3)
+        opt33lbl = tk.Label(optionsfrm, text="Option 33:")
+        opt33lbl.grid(column = 0, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt33enlbl = tk.Label(optionsfrm, text="Enabled")
+        opt33enlbl.grid(column = 1, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt33chk = tk.Checkbutton(optionsfrm)
+        opt33chk.grid(column = 2, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt33datalbl = tk.Label(optionsfrm, text="Data")
+        opt33datalbl.grid(column = 3, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt33data = tk.Entry(optionsfrm)
+        opt33data.grid(column = 4, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt66lbl = tk.Label(optionsfrm, text="Option 66:")
+        opt66lbl.grid(column = 0, row = 1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt67lbl = tk.Label(optionsfrm, text="Option 67:")
+        opt67lbl.grid(column = 0, row = 2, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
+        opt150lbl = tk.Label(optionsfrm, text="Option 150:")
+        opt150lbl.grid(column = 0, row = 3, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky=GlobalVars.staticsticky)
         pingtablblfrm = tk.LabelFrame(pingtab, text="Ping")
         pingtablblfrm.grid(column = 0, row = 0, padx = GlobalVars.defpadx, pady = (10, 5), sticky=GlobalVars.staticsticky)
         pingoutputlblfrm = tk.LabelFrame(pingtab, text="Output")
@@ -748,9 +792,6 @@ class BuildGUI():
     procsht.enable_bindings(("right_click_popup_menu", "row_select"))
     procsht.set_sheet_data(data=GlobalVars.proclist)
     procsht.headers(["User","PID","CPU %","Mem %","TTY","Command"])
-    #for each in GlobalVars.proclist:
-    #    procsht.insert_row(values=GlobalVars.proclist)
-    #procsht.insert_row("test")
     proctabbtnfrm = tk.Frame(proctab)
     proctabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
     killprocbtn = tk.Button(proctabbtnfrm, text="Kill Process", width = GlobalVars.btnsize, state="disabled")
@@ -788,14 +829,19 @@ class BuildGUI():
     lclusrsht.enable_bindings(("row_select"))
     lclusrsht.headers(["User"])
     lclusrsht.set_sheet_data(data=GlobalVars.allusers)
+    lgusrtabbtnfrm = tk.Frame(userstab)
+    lgusrtabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+    logoutbtn = tk.Button(lgusrtabbtnfrm, text="Logout", width = GlobalVars.btnsize, command=GUIActions.logoutuser)
     usrtabbtnfrm = tk.Frame(userstab)
-    usrtabbtnfrm.grid(column = 2, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+    usrtabbtnfrm.grid(column = 2, row = 1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+    chgpassbtn = tk.Button(usrtabbtnfrm, text="Change Password", width = GlobalVars.btnsize, command=GUIActions.deluser, state="disabled")
+    chgpassbtn.grid(column = 0, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
     newuserbtn = tk.Button(usrtabbtnfrm, text="New User", width = GlobalVars.btnsize, command=GUIActions.newuser)
-    newuserbtn.grid(column = 0, row = 0, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+    newuserbtn.grid(column = 0, row = 1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
     disableuserbtn = tk.Button(usrtabbtnfrm, text="Disable User", width = GlobalVars.btnsize, command=GUIActions.disableuser, state="disabled")
-    disableuserbtn.grid(column = 0, row = 1, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+    disableuserbtn.grid(column = 0, row = 2, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
     deluserbtn = tk.Button(usrtabbtnfrm, text="Remove User", width = GlobalVars.btnsize, command=GUIActions.deluser, state="disabled")
-    deluserbtn.grid(column = 0, row = 2, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
+    deluserbtn.grid(column = 0, row = 3, padx = GlobalVars.defpadx, pady = GlobalVars.defpady, sticky='N')
     nettabcontfrm = tk.LabelFrame(nettab, text="Connection Status")
     nettabcontfrm.grid(column = 0, row = 1, padx = GlobalVars.defpadx, pady = (10, 5), sticky='NEW', columnspan=2)
     nettabbtnfrm = tk.Frame(nettab)
